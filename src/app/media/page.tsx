@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { MessageSquareText, Video } from "lucide-react";
+import { Headphones, Video } from "lucide-react";
 import { AdmissionsCta } from "@/components/admissions-cta";
-import { MediaPlayer } from "@/components/media-player";
+import { MediaGallery } from "@/components/media-gallery";
 import { PageHero } from "@/components/page-hero";
 import { SectionHeading } from "@/components/section-heading";
-import { VideoShowcase } from "@/components/video-showcase";
 import { createMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = createMetadata(
@@ -16,22 +15,17 @@ export const metadata: Metadata = createMetadata(
 export default function MediaPage() {
   return (
     <>
-      <PageHero title="Academy media" path="/media" description="Real academy, classroom, campus and results media. Videos load on demand to protect mobile performance." />
-      <section className="section-pad bg-cream-50">
-        <div className="container-shell">
-          <div className="flex items-start gap-4 border-l-2 border-gold-500 bg-white p-5"><Video size={22} className="shrink-0 text-burgundy-700" /><p className="text-sm leading-6 text-navy-600">Every item on this page comes from the supplied optimized academy media. No stock campus, teacher or student imagery has been introduced.</p></div>
-          <div className="mt-12"><SectionHeading eyebrow="Real environment" title="Inside Sir Saqib Tuitions." description="Select a video to play it. Other videos remain idle and use lightweight poster fallbacks." /></div>
-          <div className="mt-10"><VideoShowcase /></div>
-        </div>
-      </section>
-      <section className="section-pad bg-white">
-        <div className="container-shell grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-          <div className="overflow-hidden rounded-md border border-navy-900/10 bg-navy-950 p-2"><MediaPlayer src="/assets/videos/testimonials/student-testimonials.mp4" poster="/assets/posters/faculty-instructors.webp" title="Student testimonial recording" className="aspect-video rounded-sm" /></div>
-          <div>
-            <MessageSquareText size={27} className="text-gold-700" />
-            <SectionHeading eyebrow="Testimonial recording" title="The student's own voice." description="No written quote is shown because a verified transcript was not supplied." />
-            <p className="mt-5 border-l-2 border-gold-500 bg-cream-50 p-4 text-sm leading-6 text-navy-600"><strong className="text-navy-950">Transcript placeholder:</strong> A verified transcript is not currently available. Play the original recording for the student&apos;s words.</p>
+      <PageHero title="See the academy in motion" path="/media" description="Choose from academy introductions, campus views, classroom learning, results and student voices." tone="ink" index="07">
+        <div className="flex gap-5 text-white/62"><Video /><Headphones /><span className="text-xs font-bold uppercase">Play on demand</span></div>
+      </PageHero>
+      <section className="section-pad bg-cream">
+        <div className="container-wide">
+          <div className="grid gap-8 lg:grid-cols-[0.62fr_1.38fr] lg:items-end">
+            <SectionHeading eyebrow="Academy recordings" title="One focused player. Six real perspectives." description="Select a category below the player. Only the active video element is rendered, keeping the experience light on mobile." />
+            <div className="hidden border-l border-gold pl-6 lg:block"><p className="font-display text-5xl text-ink">Sound on tap</p><p className="mt-2 text-sm text-muted">Every non-hero video waits for your interaction.</p></div>
           </div>
+          <div className="mt-12"><MediaGallery /></div>
+          <p className="mt-5 text-xs leading-6 text-muted">Student recordings are presented in their original video form; a written transcript is not currently available.</p>
         </div>
       </section>
       <AdmissionsCta />

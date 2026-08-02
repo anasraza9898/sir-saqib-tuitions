@@ -3,104 +3,152 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useState } from "react";
-import { ArrowRight, Menu, Phone, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, ChevronDown, Menu, MessageCircle, Phone, X } from "lucide-react";
 import { Modal } from "@/components/modal";
-import { navigation, site } from "@/data/site";
-import { cn, telHref } from "@/lib/utils";
+import { site } from "@/data/site";
+import { cn, telHref, whatsappHref } from "@/lib/utils";
+
+const academics = [
+  { label: "Courses", href: "/courses", note: "Programs and pathways" },
+  { label: "Faculty", href: "/faculty", note: "Qualifications and experience" },
+  { label: "Timetables", href: "/timetables", note: "Find your class schedule" },
+];
+
+const explore = [
+  { label: "Campuses", href: "/campuses", note: "Three Karachi locations" },
+  { label: "Results", href: "/results", note: "2026 and previous highlights" },
+  { label: "Media", href: "/media", note: "Real academy recordings" },
+];
+
+const mobileItems = [
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  ...academics.map(({ label, href }) => ({ label, href })),
+  ...explore.map(({ label, href }) => ({ label, href })),
+  { label: "Contact", href: "/contact" },
+];
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
+  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const [openGroup, setOpenGroup] = useState<"academics" | "explore" | null>(null);
+  const closeMobile = useCallback(() => setMenuOpen(false), []);
 
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => setScrolled(window.scrollY > 48));
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => { cancelAnimationFrame(frame); window.removeEventListener("scroll", update); };
+  }, []);
+
+  useEffect(() => {
+    function onPointerDown(event: PointerEvent) {
+      if (headerRef.current && !headerRef.current.contains(event.target as Node)) setOpenGroup(null);
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpenGroup(null);
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => { document.removeEventListener("pointerdown", onPointerDown); document.removeEventListener("keydown", onKeyDown); };
+  }, []);
+
+  const active = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const lightText = scrolled;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-navy-900/10 bg-white/95 shadow-[0_1px_12px_rgba(7,22,48,0.05)] supports-[backdrop-filter]:bg-white/90 supports-[backdrop-filter]:backdrop-blur-sm">
-      <div className="container-shell flex h-[72px] items-center justify-between gap-5">
+    <header
+      ref={headerRef}
+      className={cn(
+        "sticky top-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300",
+        scrolled
+          ? "border-white/10 bg-ink/95 text-white shadow-[0_8px_24px_rgba(8,17,38,0.12)] supports-[backdrop-filter]:backdrop-blur-sm"
+          : "border-cream-deep bg-paper/95 text-ink",
+      )}
+    >
+      <div className={cn("container-wide flex items-center justify-between gap-6 transition-[height] duration-300", scrolled ? "h-16" : "h-[76px]")}>
         <Link href="/" className="group flex min-w-0 items-center gap-3" aria-label={`${site.name} home`}>
-          <Image
-            src="/assets/logo/sir-saqib-tuitions-logo.webp"
-            alt=""
-            width={52}
-            height={52}
-            priority
-            className="h-11 w-11 rounded-sm object-cover ring-1 ring-navy-900/10"
-          />
+          <Image src="/assets/logo/sir-saqib-tuitions-logo.webp" alt="" width={52} height={52} priority className={cn("rounded-sm object-cover ring-1 transition-[width,height] duration-300", scrolled ? "h-10 w-10 ring-white/15" : "h-12 w-12 ring-ink/10")} />
           <span className="min-w-0">
-            <span className="block truncate font-display text-lg font-bold text-navy-950 sm:text-xl">{site.name}</span>
-            <span className="hidden text-[10px] font-semibold uppercase text-gold-700 sm:block">Sound success in education</span>
+            <span className="block truncate font-display text-xl text-current sm:text-2xl">{site.name}</span>
+            <span className={cn("hidden text-[10px] font-bold uppercase transition-colors sm:block", lightText ? "text-gold-light" : "text-girls")}>Sound success in education</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Primary navigation">
-          {navigation.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive(item.href) ? "page" : undefined}
-              className={cn(
-                "relative px-2.5 py-2 text-[13px] font-semibold text-navy-700 transition-colors hover:text-navy-950 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-gold-500",
-                isActive(item.href) && "text-navy-950 after:absolute after:inset-x-2.5 after:-bottom-[17px] after:h-0.5 after:bg-gold-500",
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
+          <DirectLink href="/" label="Home" isActive={active("/")} light={lightText} />
+          <DirectLink href="/about" label="About" isActive={active("/about")} light={lightText} />
+          <NavGroup label="Academics" items={academics} open={openGroup === "academics"} active={academics.some((item) => active(item.href))} light={lightText} onToggle={() => setOpenGroup((current) => current === "academics" ? null : "academics")} onClose={() => setOpenGroup(null)} />
+          <NavGroup label="Explore" items={explore} open={openGroup === "explore"} active={explore.some((item) => active(item.href))} light={lightText} onToggle={() => setOpenGroup((current) => current === "explore" ? null : "explore")} onClose={() => setOpenGroup(null)} />
+          <DirectLink href="/contact" label="Contact" isActive={active("/contact")} light={lightText} />
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link href="/contact#enquiry" className="btn-primary hidden lg:inline-flex">
-            Enroll Now <ArrowRight size={16} aria-hidden="true" />
+          <Link href="/contact#enquiry" className={cn("hidden xl:inline-flex", scrolled ? "button-gold" : "button-ink")}>
+            Get Admission Guidance <ArrowRight size={16} />
           </Link>
-          <button
-            type="button"
-            className="icon-button xl:hidden"
-            onClick={() => setMenuOpen(true)}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-navigation"
-            aria-label="Open navigation menu"
-          >
-            <Menu size={22} />
+          <button type="button" className={cn("icon-control lg:hidden", scrolled && "border-white/20 bg-white/5 text-white")} onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} aria-controls="mobile-navigation" aria-label="Open navigation menu">
+            <Menu size={21} />
           </button>
         </div>
       </div>
 
-      <Modal open={menuOpen} onClose={closeMenu} labelledBy="mobile-menu-title" className="ml-auto h-dvh max-h-dvh max-w-sm rounded-none sm:rounded-none">
-        <div id="mobile-navigation" className="flex min-h-full flex-col bg-cream-50">
-          <div className="flex items-center justify-between border-b border-navy-900/10 px-5 py-4">
-            <div>
-              <p id="mobile-menu-title" className="font-display text-xl font-bold text-navy-950">Navigate</p>
-              <p className="text-xs text-navy-600">Sir Saqib Tuitions</p>
+      <Modal open={menuOpen} onClose={closeMobile} labelledBy="mobile-menu-title" className="ml-auto h-dvh max-h-dvh max-w-md rounded-none sm:rounded-none">
+        <div id="mobile-navigation" className="flex min-h-full flex-col bg-cream">
+          <div className="flex items-center justify-between border-b border-cream-deep px-5 py-4">
+            <div className="flex items-center gap-3">
+              <Image src="/assets/logo/sir-saqib-tuitions-logo.webp" alt="" width={44} height={44} className="h-11 w-11 rounded-sm object-cover" />
+              <div><p id="mobile-menu-title" className="font-display text-2xl text-ink">Explore</p><p className="text-xs text-muted">Sir Saqib Tuitions</p></div>
             </div>
-            <button type="button" className="icon-button" onClick={closeMenu} aria-label="Close navigation menu">
-              <X size={21} />
-            </button>
+            <button type="button" className="icon-control" onClick={closeMobile} aria-label="Close navigation menu"><X size={20} /></button>
           </div>
-          <nav className="flex-1 px-4 py-5" aria-label="Mobile navigation">
-            {navigation.map((item, index) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={closeMenu}
-                aria-current={isActive(item.href) ? "page" : undefined}
-                className={cn(
-                  "flex items-center justify-between border-b border-navy-900/10 px-2 py-3.5 text-base font-semibold text-navy-800",
-                  isActive(item.href) && "text-burgundy-700",
-                )}
-              >
-                <span><span className="mr-3 text-xs font-bold text-gold-700">{String(index + 1).padStart(2, "0")}</span>{item.label}</span>
-                <ArrowRight size={16} aria-hidden="true" />
-              </Link>
+          <motion.nav className="flex-1 px-5 py-4" aria-label="Mobile navigation" initial="hidden" animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.045 } } }}>
+            {mobileItems.map((item, index) => (
+              <motion.div key={item.href} variants={{ hidden: { opacity: 0, x: 12 }, visible: { opacity: 1, x: 0 } }}>
+                <Link href={item.href} onClick={closeMobile} aria-current={active(item.href) ? "page" : undefined} className={cn("flex items-center justify-between border-b border-ink/10 px-1 py-3.5 text-base font-bold text-ink", active(item.href) && "text-girls")}>
+                  <span><span className="mr-3 font-display text-sm text-gold">{String(index + 1).padStart(2, "0")}</span>{item.label}</span><ArrowRight size={16} />
+                </Link>
+              </motion.div>
             ))}
-          </nav>
-          <div className="grid grid-cols-2 gap-2 border-t border-navy-900/10 p-4">
-            <a href={telHref(site.admissionsPhone)} className="btn-secondary justify-center"><Phone size={16} /> Call</a>
-            <Link href="/contact#enquiry" onClick={closeMenu} className="btn-primary justify-center">Enroll <ArrowRight size={16} /></Link>
+          </motion.nav>
+          <div className="border-t border-cream-deep bg-paper p-4">
+            <p className="mb-3 text-xs font-bold uppercase text-muted">Admissions</p>
+            <div className="grid grid-cols-2 gap-2">
+              <a href={telHref(site.admissionsPhone)} className="button-outline"><Phone size={16} /> Call</a>
+              <a href={whatsappHref(site.whatsapp, "Hello, I would like admission guidance from Sir Saqib Tuitions.")} target="_blank" rel="noreferrer" className="button-ink"><MessageCircle size={16} /> WhatsApp</a>
+            </div>
           </div>
         </div>
       </Modal>
     </header>
+  );
+}
+
+function DirectLink({ href, label, isActive, light }: { href: string; label: string; isActive: boolean; light: boolean }) {
+  return <Link href={href} aria-current={isActive ? "page" : undefined} className={cn("relative px-3 py-2 text-sm font-bold transition-colors after:absolute after:inset-x-3 after:-bottom-1 after:h-px after:origin-left after:bg-gold after:transition-transform", light ? "text-white/78 hover:text-white" : "text-text hover:text-ink", isActive ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100")}>{label}</Link>;
+}
+
+function NavGroup({ label, items, open, active, light, onToggle, onClose }: { label: string; items: typeof academics; open: boolean; active: boolean; light: boolean; onToggle: () => void; onClose: () => void }) {
+  return (
+    <div className="relative">
+      <button type="button" onClick={onToggle} aria-expanded={open} className={cn("relative flex items-center gap-1 px-3 py-2 text-sm font-bold transition-colors after:absolute after:inset-x-3 after:-bottom-1 after:h-px after:bg-gold", light ? "text-white/78 hover:text-white" : "text-text hover:text-ink", active ? "after:scale-x-100" : "after:scale-x-0")}>
+        {label}<ChevronDown size={14} className={cn("transition-transform", open && "rotate-180")} />
+      </button>
+      <AnimatePresence>
+        {open ? (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 5 }} transition={{ duration: 0.18 }} className="absolute left-0 top-full mt-3 w-72 border border-cream-deep bg-paper p-2 text-ink shadow-[0_18px_45px_rgba(8,17,38,0.14)]">
+            {items.map((item) => <Link key={item.href} href={item.href} onClick={onClose} className="group flex items-center justify-between gap-4 border-b border-cream-deep px-3 py-3 last:border-0 hover:bg-cream"><span><span className="block text-sm font-bold">{item.label}</span><span className="mt-1 block text-xs text-muted">{item.note}</span></span><ArrowRight size={15} className="text-gold transition-transform group-hover:translate-x-0.5" /></Link>)}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </div>
   );
 }

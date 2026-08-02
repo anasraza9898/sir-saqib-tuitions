@@ -17,7 +17,7 @@ export const site = {
   name: "Sir Saqib Tuitions",
   tagline: "A Path to Sound Success in Education",
   description:
-    "Focused learning for Grades IX-XII across Science, General, Commerce, Computer Science and Pre-Engineering.",
+    "Focused preparation for Grades IX-XII, with foundation tuition for Grades I-VIII and formal education support for Huffaz.",
   admissionsPhone: "0300-2320599",
   whatsapp: "923002320599",
 } as const;
@@ -68,65 +68,81 @@ export const programs = [
   {
     id: "ix-x-science",
     title: "IX-X Science",
+    category: "Matric",
     level: "Matric",
     stream: "Science",
     description: "Focused preparation for compulsory subjects and the Science group curriculum.",
+    subjects: ["Science group", "Compulsory subjects"],
     icon: FlaskConical,
   },
   {
     id: "ix-x-general",
     title: "IX-X General",
+    category: "Matric",
     level: "Matric",
     stream: "General",
     description: "Structured coverage for General group subjects with regular assessment.",
+    subjects: ["General group", "Compulsory subjects"],
     icon: BookOpenCheck,
   },
   {
     id: "xi-xii-science",
     title: "XI-XII Science",
+    category: "Intermediate",
     level: "Intermediate",
     stream: "Science",
     description: "Subject-focused intermediate preparation for Science students.",
+    subjects: ["Science group", "Intermediate"],
     icon: Microscope,
   },
   {
     id: "xi-xii-commerce",
     title: "XI-XII Commerce",
+    category: "Intermediate",
     level: "Intermediate",
     stream: "Commerce",
     description: "Organized Commerce preparation supported by experienced faculty.",
+    subjects: ["Commerce group", "Intermediate"],
     icon: BriefcaseBusiness,
   },
   {
     id: "computer-science",
     title: "Computer Science",
+    category: "Intermediate",
     level: "Secondary & Intermediate",
     stream: "Computer Science",
     description: "Curriculum-focused preparation for students selecting Computer Science.",
+    subjects: ["Computer Science", "Compulsory subjects"],
     icon: Laptop,
   },
   {
     id: "pre-engineering",
     title: "Pre-Engineering",
+    category: "Intermediate",
     level: "Intermediate",
     stream: "Pre-Engineering",
     description: "Focused support for the core subjects in the Pre-Engineering stream.",
+    subjects: ["Pre-Engineering", "Science group"],
     icon: Calculator,
   },
   {
-    id: "iv-viii",
-    title: "Grades IV-VIII",
+    id: "i-viii",
+    title: "Grades I-VIII",
+    category: "Foundation",
     level: "Foundation",
     stream: "General",
     description: "A strong academic foundation through focused curriculum and regular attention.",
+    subjects: ["Foundation tuition", "Core subjects"],
     icon: GraduationCap,
   },
   {
     id: "huffaz-programme",
     title: "Huffaz Programme",
+    category: "Huffaz",
     level: "Formal education",
     stream: "Huffaz",
     description: "Hafiz to Formal Education Programme, including a crash course for Huffaz.",
+    subjects: ["Formal education", "Compulsory subjects"],
     icon: BrainCircuit,
   },
 ] as const;
@@ -139,6 +155,7 @@ export const campuses = [
     phones: ["0300-2320599", "0334-2320594"],
     whatsapp: "923002320599",
     address: "SA 24/1 Block #05, K.A.E.C.H.S, near Bin Ahmed Supermarket, Karachi",
+    poster: "/assets/posters/admission-boys-campus.webp",
     accent: "navy",
   },
   {
@@ -148,6 +165,7 @@ export const campuses = [
     phones: ["0321-2484395"],
     whatsapp: "923212484395",
     address: "C-11 Commercial Block #02, K.A.E.C.H.S, Karachi",
+    poster: "/assets/posters/admission-girls-campus.webp",
     accent: "burgundy",
   },
   {
@@ -157,6 +175,7 @@ export const campuses = [
     phones: ["0323-1909072", "0323-1909062"],
     whatsapp: "923231909072",
     address: "22-Z Block #7-8, K.M.C.H.S Society, near Hill Park, Karachi",
+    poster: "/assets/posters/admission-hill-park-campus.webp",
     accent: "gold",
   },
 ] as const;
@@ -222,28 +241,39 @@ export const timetables: Timetable[] = [
   { id: "g12s", campus: "girls", classLevel: "12", stream: "Science", variant: "Standard", src: "/assets/timetables/girls/class-12-science.webp" },
 ];
 
-export const mediaItems = [
-  { title: "Academy introduction", description: "An introduction to Sir Saqib Tuitions and admissions.", src: "/assets/videos/intro/academy-intro.mp4", poster: "/assets/posters/current-facebook-poster.webp" },
-  { title: "Girls campus introduction", description: "A look at girls campus learning and admissions.", src: "/assets/videos/intro/girls-intro-results-admissions.mp4", poster: "/assets/posters/admission-girls-campus.webp" },
-  { title: "Classroom learning", description: "Real classroom teaching and student learning.", src: "/assets/videos/classroom/classroom-teaching-student-learning.mp4", poster: "/assets/posters/current-facebook-poster.webp" },
-  { title: "Boys campus classroom", description: "A real classroom view from the boys campus.", src: "/assets/videos/campus/boys-classroom.mp4", poster: "/assets/posters/admission-boys-campus.webp" },
-  { title: "2026 result highlights", description: "Matric Science high achievers from 2026.", src: "/assets/videos/results/matric-science-high-achievers-2026.mp4", poster: "/assets/results/boys-matric-science-general-2026.webp" },
-] as const;
+export type MediaItem = {
+  id: string;
+  category: "Academy Introduction" | "Girls Campus" | "Boys Campus" | "Classroom Learning" | "Results" | "Testimonials";
+  title: string;
+  description: string;
+  src: string;
+  poster: string;
+  duration: string;
+};
+
+export const mediaItems: MediaItem[] = [
+  { id: "academy-introduction", category: "Academy Introduction", title: "Meet Sir Saqib", description: "Sir Saqib introduces the academy and its learning approach.", src: "/assets/videos/hero/sir-saqib-introduction.mp4", poster: "/assets/posters/video/sir-saqib-introduction.webp", duration: "0:37" },
+  { id: "girls-campus", category: "Girls Campus", title: "Girls Campus", description: "An introduction to the Girls Campus and admissions.", src: "/assets/videos/intro/girls-intro-results-admissions.mp4", poster: "/assets/posters/video/girls-campus-introduction.webp", duration: "0:33" },
+  { id: "boys-campus", category: "Boys Campus", title: "Boys Campus", description: "A look inside the Boys Campus learning environment.", src: "/assets/videos/campus/boys-classroom.mp4", poster: "/assets/posters/video/boys-campus-classroom.webp", duration: "1:10" },
+  { id: "classroom-learning", category: "Classroom Learning", title: "Classroom Learning", description: "Teaching and focused student learning in a real classroom.", src: "/assets/videos/classroom/classroom-teaching-student-learning.mp4", poster: "/assets/posters/video/classroom-learning.webp", duration: "0:25" },
+  { id: "results-2026", category: "Results", title: "2026 Result Highlights", description: "Matric Science high achievers from the 2026 results.", src: "/assets/videos/results/matric-science-high-achievers-2026.mp4", poster: "/assets/posters/video/results-2026.webp", duration: "0:15" },
+  { id: "student-voices", category: "Testimonials", title: "Student Voices", description: "A student shares his experience in the original academy recording.", src: "/assets/videos/testimonials/student-testimonials.mp4", poster: "/assets/posters/video/student-testimonial.webp", duration: "1:31" },
+];
 
 export const faqs = [
-  { question: "Which classes are offered?", answer: "Sir Saqib Tuitions offers tuition for Grades IV-VIII and Grades IX-XII." },
+  { question: "Which classes are offered?", answer: "Sir Saqib Tuitions offers tuition for Grades I-VIII and Grades IX-XII." },
   { question: "Which streams are available?", answer: "Available study paths include Science, General, Commerce, Computer Science and Pre-Engineering." },
   { question: "Are there separate boys and girls campuses?", answer: "Yes. There are dedicated Boys and Girls campuses, along with the Hill Park Campus in Karachi." },
   { question: "Is there a programme for Huffaz?", answer: "Yes. The academy offers a Hafiz to Formal Education Programme and a crash course for Huffaz." },
-  { question: "How can parents contact admissions?", answer: "Parents can call a campus directly or start a WhatsApp conversation using the contact options on this website. Fees, exact timings, registration documents and trial-class details should be confirmed with admissions." },
+  { question: "How can parents contact admissions?", answer: "Parents can call a campus directly or use the website's WhatsApp enquiry builder. Admissions will provide current fees, timings and registration guidance." },
 ] as const;
 
 export const assistantAnswers = {
-  Courses: "We offer Grades IV-VIII, IX-X Science and General, XI-XII Science and Commerce, Computer Science, Pre-Engineering, and the Huffaz Programme.",
-  Campuses: "There are three Karachi campuses: Boys Campus in K.A.E.C.H.S, Girls Campus in K.A.E.C.H.S, and Hill Park Campus near Hill Park.",
-  Timetables: "Use the Timetables page to filter the real posters by Boys or Girls, class and stream. Confirm any last-minute changes with the campus.",
-  Admissions: "Admissions are open. For fees, exact timings, required documents or trial-class details, contact admissions directly because those details are not published here.",
-  Contact: "Call 0300-2320599 or choose a campus on the Contact page for its phone, WhatsApp and map options.",
+  "Find a Course": "Choose from Grades I-VIII foundation tuition, IX-X Science and General, XI-XII Science and Commerce, Computer Science, Pre-Engineering, or the Huffaz Programme.",
+  "Choose a Campus": "The Boys and Girls campuses are in K.A.E.C.H.S, while the Hill Park Campus is near Hill Park. Each campus page includes direct call, WhatsApp and map actions.",
+  "Find a Timetable": "Open the timetable finder to filter by Boys or Girls, class, stream and batch. The selected academy poster can be viewed or downloaded.",
+  "Admissions Contact": "Admissions are open. Call 0300-2320599 or choose a campus to ask about current fees, timings and registration guidance.",
+  "Latest Results": "The latest gallery presents the academy's 2026 Matric result posters, with 2025 shown separately as previous academic highlights.",
 } as const;
 
 export const buildingIcon = Building2;

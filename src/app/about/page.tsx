@@ -1,59 +1,54 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpenCheck, ClipboardCheck, GraduationCap, Handshake, ShieldCheck, UsersRound } from "lucide-react";
+import { ArrowRight, BookOpenCheck, ClipboardCheck, Handshake, ShieldCheck, UsersRound } from "lucide-react";
 import { AdmissionsCta } from "@/components/admissions-cta";
+import { MotionReveal, MotionStagger, MotionStaggerItem } from "@/components/motion-system";
 import { PageHero } from "@/components/page-hero";
+import { PremiumVideo } from "@/components/premium-video";
 import { SectionHeading } from "@/components/section-heading";
-import { strengths } from "@/data/site";
 import { createMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = createMetadata(
-  "About",
-  "Learn about the academic approach, teaching structure and verified strengths of Sir Saqib Tuitions in Karachi.",
-  "/about",
-);
+export const metadata: Metadata = createMetadata("About", "Discover the teaching philosophy, assessment structure and 24-year academic leadership behind Sir Saqib Tuitions in Karachi.", "/about");
 
-const approach = [
-  { title: "Teach with focus", text: "Qualified faculty and high-yield notes keep learning connected to the curriculum.", icon: BookOpenCheck },
-  { title: "Assess regularly", text: "Monthly assessments, MTS, mid-terms and final-term examinations make progress visible.", icon: ClipboardCheck },
-  { title: "Support individually", text: "Individual attention and good study space help students work with consistency.", icon: UsersRound },
-  { title: "Partner with parents", text: "Parent meetings connect academic progress with the support students receive at home.", icon: Handshake },
+const timeline = [
+  { title: "Focused teaching", text: "Qualified faculty and high-yield notes keep lessons connected to the curriculum.", icon: BookOpenCheck },
+  { title: "Regular assessment", text: "Monthly assessments, MTS, mid-terms and final-term examinations make progress visible.", icon: ClipboardCheck },
+  { title: "Individual support", text: "Attention, discipline and good study space help students work consistently.", icon: UsersRound },
+  { title: "Parent partnership", text: "Parent meetings connect classroom progress with support at home.", icon: Handshake },
 ];
 
 export default function AboutPage() {
   return (
     <>
-      <PageHero title="About the academy" path="/about" description="A disciplined, focused learning environment for students from Grades IV-XII across three Karachi campuses." />
-      <section className="section-pad bg-white">
-        <div className="container-shell grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-center">
-          <div>
-            <SectionHeading eyebrow="Sir Saqib Tuitions" title="Academic structure built around sound preparation." />
-            <p className="mt-6 text-base leading-8 text-navy-600">Sir Saqib Tuitions supports foundation, Matric and Intermediate students through focused curriculum coverage, regular assessments and individual attention. Sir Saqib Zaki brings 24 years of experience to an academy supported by qualified faculty.</p>
-            <p className="mt-4 text-base leading-8 text-navy-600">The learning model combines strict discipline, high-yield notes, MTS, examinations and parent meetings. Students can study across dedicated Boys, Girls and Hill Park campuses in Karachi.</p>
-            <div className="mt-8 flex flex-wrap gap-3"><Link href="/faculty" className="btn-primary">Meet the faculty <ArrowRight size={16} /></Link><Link href="/campuses" className="btn-secondary">Explore campuses</Link></div>
-          </div>
-          <div className="relative aspect-[3/4] overflow-hidden rounded-md border border-navy-900/10 bg-cream-100 shadow-lg sm:aspect-[4/3] lg:aspect-[3/4]">
-            <Image src="/assets/posters/faculty-instructors.webp" alt="Published Sir Saqib Tuitions faculty and campus information poster" fill sizes="(max-width: 1024px) 100vw, 45vw" className="object-contain" priority />
-          </div>
-        </div>
-      </section>
-      <section className="section-pad bg-cream-50">
-        <div className="container-shell">
-          <SectionHeading eyebrow="Our approach" title="A visible cycle of teaching and progress." description="Each part of the academic process reinforces consistent preparation." />
-          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {approach.map((item, index) => { const Icon = item.icon; return <article key={item.title} className="border-t-2 border-gold-500 bg-white p-5"><span className="flex h-10 w-10 items-center justify-center rounded-sm bg-navy-950 text-gold-300"><Icon size={19} /></span><p className="mt-6 text-xs font-bold text-burgundy-700">Step {index + 1}</p><h2 className="mt-2 font-display text-xl font-bold text-navy-950">{item.title}</h2><p className="mt-3 text-sm leading-6 text-navy-600">{item.text}</p></article>; })}
+      <PageHero title="An academy built around focused progress" path="/about" description="For Grades I-VIII and IX-XII, serious preparation means clear teaching, regular assessment and an environment designed for attention." tone="ink" index="01">
+        <div className="border-l border-gold/50 pl-5 text-white"><p className="font-display text-5xl text-gold-light">24</p><p className="mt-1 text-xs font-bold uppercase text-white/50">Years of leadership</p></div>
+      </PageHero>
+
+      <section className="section-space bg-paper">
+        <div className="container-wide grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-20">
+          <MotionReveal className="order-2 lg:order-1"><PremiumVideo id="about-sir-saqib" src="/assets/videos/hero/sir-saqib-introduction.mp4" poster="/assets/posters/video/sir-saqib-introduction.webp" title="Sir Saqib academy introduction" duration="0:37" label="Academy Philosophy" className="mx-auto aspect-[464/832] max-w-md" /></MotionReveal>
+          <div className="order-1 lg:order-2">
+            <SectionHeading eyebrow="Academy philosophy" title="Structure gives effort somewhere to go." description="Sir Saqib Tuitions brings curriculum, assessment and individual support into one clear learning rhythm." />
+            <p className="mt-7 text-base leading-8 text-muted">Sir Saqib Zaki brings 24 years of experience to an academy supported by qualified faculty. Students study across dedicated Boys, Girls and Hill Park campuses in Karachi.</p>
+            <blockquote className="mt-8 border-l-2 border-gold bg-cream p-5 font-display text-2xl leading-snug text-ink">&ldquo;A Path to Sound Success in Education&rdquo;</blockquote>
+            <Link href="/faculty" className="button-ink mt-7">Meet the faculty <ArrowRight size={16} /></Link>
           </div>
         </div>
       </section>
-      <section className="section-pad bg-white">
-        <div className="container-shell">
-          <SectionHeading eyebrow="Verified strengths" title="What families can expect." />
-          <div className="mt-10 grid gap-px overflow-hidden rounded-md bg-navy-900/10 sm:grid-cols-2">
-            {strengths.map((item) => { const Icon = item.icon; return <article key={item.title} className="flex gap-4 bg-white p-6"><Icon size={22} className="mt-1 shrink-0 text-burgundy-700" /><div><h2 className="font-display text-xl font-bold text-navy-950">{item.title}</h2><p className="mt-2 text-sm leading-6 text-navy-600">{item.description}</p></div></article>; })}
-            <article className="flex gap-4 bg-white p-6"><ShieldCheck size={22} className="mt-1 shrink-0 text-burgundy-700" /><div><h2 className="font-display text-xl font-bold text-navy-950">Focused environment</h2><p className="mt-2 text-sm leading-6 text-navy-600">Secured learning spaces, discipline and good study space support daily academic work.</p></div></article>
-            <article className="flex gap-4 bg-white p-6"><GraduationCap size={22} className="mt-1 shrink-0 text-burgundy-700" /><div><h2 className="font-display text-xl font-bold text-navy-950">Broad academic range</h2><p className="mt-2 text-sm leading-6 text-navy-600">Programs cover Grades IV-XII, multiple streams and formal education support for Huffaz.</p></div></article>
-          </div>
+
+      <section className="section-space border-y border-cream-deep bg-cream">
+        <div className="container-wide">
+          <SectionHeading number="02" eyebrow="Teaching to progress" title="A learning cycle families can follow." description="Each stage supports the next, from the first lesson to the conversation with parents." />
+          <MotionStagger className="relative mt-12 grid gap-0 border-y border-ink/12 lg:grid-cols-4">
+            {timeline.map((item, index) => { const Icon = item.icon; return <MotionStaggerItem key={item.title} className="relative border-b border-ink/12 px-5 py-7 last:border-b-0 lg:border-b-0 lg:border-r lg:last:border-r-0"><span className="absolute right-4 top-4 font-display text-4xl text-gold/35">0{index + 1}</span><Icon size={22} className="text-girls" /><h2 className="mt-10 font-display text-2xl text-ink">{item.title}</h2><p className="mt-3 text-sm leading-7 text-muted">{item.text}</p></MotionStaggerItem>; })}
+          </MotionStagger>
+        </div>
+      </section>
+
+      <section className="section-space bg-paper">
+        <div className="container-wide grid gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+          <div><SectionHeading number="03" eyebrow="The environment" title="Attention, discipline and room to study." /><div className="mt-8 flex items-center gap-4 border-y border-cream-deep py-5"><ShieldCheck size={24} className="text-gold" /><p className="text-sm leading-7 text-muted">A secured environment, strict discipline and good study space support consistent academic work.</p></div></div>
+          <div className="grid gap-px bg-cream-deep sm:grid-cols-2"><div className="bg-cream p-7"><p className="font-display text-4xl text-ink">3 campuses</p><p className="mt-3 text-sm text-muted">Boys, Girls and Hill Park locations in Karachi.</p></div><div className="bg-ink p-7 text-white"><p className="font-display text-4xl text-gold-light">Grades I-VIII</p><p className="mt-3 text-sm text-white/58">Foundation tuition alongside Grades IX-XII pathways.</p></div></div>
         </div>
       </section>
       <AdmissionsCta />

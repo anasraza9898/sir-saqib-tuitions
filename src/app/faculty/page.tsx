@@ -1,54 +1,71 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import { Award, BookOpenCheck, GraduationCap } from "lucide-react";
+import { Award, BookOpen, FlaskConical, Sigma } from "lucide-react";
 import { AdmissionsCta } from "@/components/admissions-cta";
+import { FacultyRoster } from "@/components/faculty-roster";
+import { MotionReveal } from "@/components/motion-system";
 import { PageHero } from "@/components/page-hero";
 import { SectionHeading } from "@/components/section-heading";
 import { faculty } from "@/data/site";
 import { createMetadata } from "@/lib/metadata";
-import { initials } from "@/lib/utils";
 
 export const metadata: Metadata = createMetadata(
   "Faculty",
-  "Meet the verified faculty at Sir Saqib Tuitions, including qualifications and years of teaching experience.",
+  "Meet the qualified Sir Saqib Tuitions faculty across Mathematics, Science, Commerce, Engineering and Computer Science in Karachi.",
   "/faculty",
 );
+
+const subjectGroups = [
+  { title: "Mathematics", names: "Sir Muhammad Armash / Sir Shahid Punal", icon: Sigma },
+  { title: "Science & Health", names: "Sir Hanzala Nauman / Miss Javeria / Sir Hassan Haroon", icon: FlaskConical },
+  { title: "Commerce & Leadership", names: "Sir Saqib Zaki / Sir Ashhad Sohail", icon: Award },
+  { title: "Engineering & Computing", names: "Eng. Babar Ashraf / Sir Hasan", icon: BookOpen },
+] as const;
 
 export default function FacultyPage() {
   return (
     <>
-      <PageHero title="Our faculty" path="/faculty" description="Verified qualifications and experience across Mathematics, Science, Commerce, Engineering and Computer Science." />
-      <section className="section-pad bg-cream-50">
-        <div className="container-shell">
-          <SectionHeading eyebrow="Dedicated instructors" title="Credentials presented without stock portraits." description="Each profile below uses the verified faculty data supplied by the academy." />
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {faculty.map((member, index) => (
-              <article key={member.name} className="group overflow-hidden rounded-md border border-navy-900/10 bg-white shadow-sm">
-                <div className="flex items-center justify-between bg-navy-950 p-5 text-white">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-sm border border-gold-300/40 bg-navy-900 font-display text-xl font-bold text-gold-300">{initials(member.name)}</span>
-                  <span className="font-display text-3xl font-bold text-gold-300">{String(index + 1).padStart(2, "0")}</span>
-                </div>
-                <div className="p-5">
-                  <p className="text-xs font-bold uppercase text-burgundy-700">{member.field}</p>
-                  <h2 className="mt-2 font-display text-2xl font-bold text-navy-950">{member.name}</h2>
-                  <p className="mt-3 min-h-12 text-sm leading-6 text-navy-600">{member.qualification}</p>
-                  <div className="mt-5 flex items-center gap-2 border-t border-navy-900/10 pt-4 text-sm font-bold text-navy-900"><Award size={17} className="text-gold-700" />{member.experience} years experience</div>
-                </div>
+      <PageHero title="Teaching depth, clearly presented" path="/faculty" description="A qualified faculty roster spanning Mathematics, Science, Commerce, Engineering and Computer Science." tone="cream" index="04">
+        <div className="border-l border-gold pl-5"><p className="font-display text-5xl text-ink">24</p><p className="mt-1 text-xs font-bold uppercase text-muted">Years of leadership</p></div>
+      </PageHero>
+
+      <section className="section-pad bg-paper">
+        <div className="container-wide">
+          <SectionHeading eyebrow="Academic leadership" title="Experience at the front. Subject depth throughout." description="Sir Saqib Zaki leads a structured faculty roster with qualifications and experience shown directly." />
+          <div className="mt-10"><FacultyRoster /></div>
+        </div>
+      </section>
+
+      <section className="border-y border-cream-deep bg-cream">
+        <div className="container-wide grid lg:grid-cols-[0.72fr_1.28fr]">
+          <MotionReveal className="border-b border-cream-deep py-12 lg:border-b-0 lg:border-r lg:py-16 lg:pr-12">
+            <p className="eyebrow text-girls">Subject structure</p>
+            <h2 className="mt-5 font-display text-4xl leading-tight text-ink sm:text-5xl">The right academic lens for each pathway.</h2>
+            <p className="mt-5 max-w-md text-sm leading-7 text-muted">Faculty specialisms support the academy&apos;s Mathematics, Science, Commerce, Engineering and computing pathways.</p>
+          </MotionReveal>
+          <div className="py-6 lg:py-10 lg:pl-12">
+            {subjectGroups.map(({ title, names, icon: Icon }, index) => (
+              <article key={title} className="grid gap-4 border-b border-ink/10 py-6 last:border-0 sm:grid-cols-[3rem_0.7fr_1.3fr] sm:items-center">
+                <span className="font-display text-xl text-gold">0{index + 1}</span>
+                <div className="flex items-center gap-3"><Icon size={18} className="text-girls" /><h3 className="font-display text-xl text-ink">{title}</h3></div>
+                <p className="text-sm leading-6 text-muted">{names}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
-      <section className="section-pad bg-white">
-        <div className="container-shell grid gap-10 lg:grid-cols-[1fr_0.8fr] lg:items-center">
-          <div>
-            <SectionHeading eyebrow="Faculty overview" title="The academy's published instructor roster." description="The original academy poster provides a visual reference for the complete roster shown above." />
-            <div className="mt-7 grid gap-4 sm:grid-cols-2">
-              <div className="flex gap-3 border-l-2 border-gold-500 bg-cream-50 p-4"><GraduationCap size={21} className="shrink-0 text-burgundy-700" /><p className="text-sm leading-6 text-navy-600"><strong className="text-navy-950">Qualified faculty</strong><br />Subject-focused academic support.</p></div>
-              <div className="flex gap-3 border-l-2 border-gold-500 bg-cream-50 p-4"><BookOpenCheck size={21} className="shrink-0 text-burgundy-700" /><p className="text-sm leading-6 text-navy-600"><strong className="text-navy-950">Focused curriculum</strong><br />Teaching aligned with preparation.</p></div>
-            </div>
+
+      <section className="section-pad bg-paper">
+        <div className="container-wide grid gap-10 lg:grid-cols-[0.58fr_1.42fr] lg:items-start">
+          <SectionHeading eyebrow="Experience" title="A roster with range." description="Experience markers are based on the faculty information provided by the academy." />
+          <div className="space-y-5">
+            {faculty.map((member) => (
+              <div key={member.name} className="grid gap-2 sm:grid-cols-[13rem_1fr_4rem] sm:items-center">
+                <p className="text-sm font-bold text-ink">{member.name}</p>
+                <div className="h-1.5 overflow-hidden bg-cream-deep" aria-hidden="true"><span className="block h-full bg-gold" style={{ width: `${Math.max(12, (member.experience / 24) * 100)}%` }} /></div>
+                <p className="text-xs font-bold text-muted sm:text-right">{member.experience} yrs</p>
+              </div>
+            ))}
           </div>
-          <div className="relative aspect-[3/4] overflow-hidden rounded-md border border-navy-900/10 bg-cream-100"><Image src="/assets/posters/faculty-instructors.webp" alt="Published poster listing the Sir Saqib Tuitions faculty" fill sizes="(max-width: 1024px) 100vw, 40vw" className="object-contain" /></div>
         </div>
       </section>
       <AdmissionsCta />

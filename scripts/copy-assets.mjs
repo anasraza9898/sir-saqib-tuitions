@@ -48,8 +48,7 @@ const assetMap = {
   "videos/campus/boys classroom video.mp4": "videos/campus/boys-classroom.mp4",
   "videos/classroom/classroom + teaching + student learning.mp4": "videos/classroom/classroom-teaching-student-learning.mp4",
   "videos/intro/girls intro + result + admissions.mp4": "videos/intro/girls-intro-results-admissions.mp4",
-  "videos/intro/intro + result + admissions.mp4": "videos/hero/intro-results-admissions.mp4",
-  "videos/intro/intro.mp4": "videos/intro/academy-intro.mp4",
+  "videos/intro/intro.mp4": "videos/hero/sir-saqib-introduction.mp4",
   "videos/results/highest achivers of matric science group result 2026.mp4": "videos/results/matric-science-high-achievers-2026.mp4",
   "videos/testimonials/Tetimonials.mp4": "videos/testimonials/student-testimonials.mp4"
 };

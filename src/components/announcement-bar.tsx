@@ -6,36 +6,44 @@ import { Pause, Play } from "lucide-react";
 const announcements = [
   "Admissions Open",
   "Grades IX-XII",
-  "Science · General · Commerce",
-  "Boys · Girls · Hill Park Campuses",
+  "Science / General / Commerce",
+  "Boys / Girls / Hill Park Campuses",
+  "Grades I-VIII Foundation Tuition",
+  "Huffaz Formal Education Programme",
 ];
+
+function AnnouncementCopy({ duplicate = false }: { duplicate?: boolean }) {
+  return (
+    <ul className="marquee-copy" aria-hidden={duplicate || undefined}>
+      {announcements.map((item) => (
+        <li className="marquee-item" key={item}>
+          <span className="marquee-dot" aria-hidden="true" />{item}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function AnnouncementBar() {
   const [paused, setPaused] = useState(false);
-  const items = [...announcements, ...announcements];
-
   return (
-    <div className="relative overflow-hidden border-b border-gold-300/25 bg-navy-950 text-cream-50">
+    <aside className="marquee-shell" aria-label="Academy announcements">
       <div className="mx-auto flex min-h-9 max-w-[1600px] items-center">
-        <div className="min-w-0 flex-1 overflow-hidden" aria-label="Academy announcements">
+        <div className="min-w-0 flex-1 overflow-hidden motion-reduce:overflow-visible">
           <div className="marquee-track" data-paused={paused}>
-            {items.map((item, index) => (
-              <span className="marquee-item" key={`${item}-${index}`} aria-hidden={index >= announcements.length}>
-                <span className="h-1 w-1 rounded-full bg-gold-400" aria-hidden="true" />
-                {item}
-              </span>
-            ))}
+            <AnnouncementCopy />
+            <AnnouncementCopy duplicate />
           </div>
         </div>
         <button
           type="button"
-          className="mr-2 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-gold-200 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-300"
-          onClick={() => setPaused((value) => !value)}
+          className="mr-2 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-sm text-gold-light transition hover:bg-white/10 hover:text-white focus-visible:outline-gold"
+          onClick={() => setPaused((current) => !current)}
           aria-label={paused ? "Play announcements" : "Pause announcements"}
         >
-          {paused ? <Play size={14} fill="currentColor" /> : <Pause size={14} fill="currentColor" />}
+          {paused ? <Play size={13} fill="currentColor" /> : <Pause size={13} fill="currentColor" />}
         </button>
       </div>
-    </div>
+    </aside>
   );
 }

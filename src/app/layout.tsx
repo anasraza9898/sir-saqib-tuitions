@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope, Playfair_Display } from "next/font/google";
+import { DM_Serif_Display, Manrope } from "next/font/google";
 import { AnnouncementBar } from "@/components/announcement-bar";
+import { ClientProviders } from "@/components/client-providers";
 import { FloatingActions } from "@/components/floating-actions";
+import { RouteTransition } from "@/components/motion-system";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { campuses, site } from "@/data/site";
@@ -9,12 +11,12 @@ import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
-const playfair = Playfair_Display({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-playfair", display: "swap" });
+const dmSerif = DM_Serif_Display({ subsets: ["latin"], weight: "400", variable: "--font-dm-serif", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: {
-    default: "Sir Saqib Tuitions Karachi | IX-XII Science, General & Commerce",
+    default: "Sir Saqib Tuitions Karachi | Grades IX-XII, Science, General & Commerce",
     template: "%s | Sir Saqib Tuitions",
   },
   description: "Explore courses, campuses, faculty, results and timetables at Sir Saqib Tuitions in Karachi for Grades IX-XII, Science, General, Commerce and Huffaz programmes.",
@@ -30,7 +32,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Sir Saqib Tuitions Karachi",
-    description: "Focused learning for Grades IV-XII across three Karachi campuses.",
+    description: "Focused learning for Grades IX-XII, foundation tuition for Grades I-VIII and formal education support for Huffaz across three Karachi campuses.",
     type: "website",
     locale: "en_PK",
     url: "/",
@@ -49,7 +51,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#071630",
+  themeColor: "#081126",
   colorScheme: "light",
 };
 
@@ -61,6 +63,7 @@ const organizationJsonLd = {
       "@id": `${siteUrl.href}#organization`,
       name: site.name,
       slogan: site.tagline,
+      description: site.description,
       url: siteUrl.href,
       logo: new URL("/assets/logo/sir-saqib-tuitions-logo.webp", siteUrl).href,
       telephone: site.admissionsPhone,
@@ -86,13 +89,15 @@ const organizationJsonLd = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} ${playfair.variable} antialiased`}>
-        <a href="#main-content" className="fixed left-3 top-3 z-[120] -translate-y-20 rounded-sm bg-gold-400 px-4 py-2 text-sm font-bold text-navy-950 transition focus:translate-y-0">Skip to content</a>
-        <AnnouncementBar />
-        <SiteHeader />
-        <main id="main-content" className="pb-16 md:pb-0">{children}</main>
-        <SiteFooter />
-        <FloatingActions />
+      <body className={`${manrope.variable} ${dmSerif.variable} antialiased`}>
+        <a href="#main-content" className="fixed left-3 top-3 z-[120] -translate-y-20 rounded-sm bg-gold px-4 py-2 text-sm font-bold text-ink transition focus:translate-y-0">Skip to content</a>
+        <ClientProviders>
+          <AnnouncementBar />
+          <SiteHeader />
+          <main id="main-content"><RouteTransition>{children}</RouteTransition></main>
+          <SiteFooter />
+          <FloatingActions />
+        </ClientProviders>
         <script type="application/ld+json">{JSON.stringify(organizationJsonLd)}</script>
       </body>
     </html>
