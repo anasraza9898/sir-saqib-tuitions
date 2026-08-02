@@ -1,0 +1,249 @@
+import {
+  BookOpenCheck,
+  BrainCircuit,
+  BriefcaseBusiness,
+  Building2,
+  Calculator,
+  FlaskConical,
+  GraduationCap,
+  Laptop,
+  Microscope,
+  ShieldCheck,
+  UserRoundCheck,
+  UsersRound,
+} from "lucide-react";
+
+export const site = {
+  name: "Sir Saqib Tuitions",
+  tagline: "A Path to Sound Success in Education",
+  description:
+    "Focused learning for Grades IX-XII across Science, General, Commerce, Computer Science and Pre-Engineering.",
+  admissionsPhone: "0300-2320599",
+  whatsapp: "923002320599",
+} as const;
+
+export const navigation = [
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Courses", href: "/courses" },
+  { label: "Campuses", href: "/campuses" },
+  { label: "Faculty", href: "/faculty" },
+  { label: "Results", href: "/results" },
+  { label: "Timetables", href: "/timetables" },
+  { label: "Media", href: "/media" },
+  { label: "Contact", href: "/contact" },
+] as const;
+
+export const trustItems = [
+  { value: "24 Years", label: "Experience" },
+  { value: "3", label: "Campuses" },
+  { value: "Qualified", label: "Faculty" },
+  { value: "IX-XII", label: "Grades" },
+] as const;
+
+export const strengths = [
+  {
+    title: "Qualified faculty",
+    description: "Experienced instructors support focused subject learning across the offered streams.",
+    icon: UserRoundCheck,
+  },
+  {
+    title: "Individual attention",
+    description: "A disciplined learning environment built around progress, support and accountability.",
+    icon: UsersRound,
+  },
+  {
+    title: "Assessment system",
+    description: "Monthly assessments, MTS, and mid-term and final-term examinations track preparation.",
+    icon: BookOpenCheck,
+  },
+  {
+    title: "Secured environment",
+    description: "Good study spaces, strict discipline and regular parent meetings support consistent learning.",
+    icon: ShieldCheck,
+  },
+] as const;
+
+export const programs = [
+  {
+    id: "ix-x-science",
+    title: "IX-X Science",
+    level: "Matric",
+    stream: "Science",
+    description: "Focused preparation for compulsory subjects and the Science group curriculum.",
+    icon: FlaskConical,
+  },
+  {
+    id: "ix-x-general",
+    title: "IX-X General",
+    level: "Matric",
+    stream: "General",
+    description: "Structured coverage for General group subjects with regular assessment.",
+    icon: BookOpenCheck,
+  },
+  {
+    id: "xi-xii-science",
+    title: "XI-XII Science",
+    level: "Intermediate",
+    stream: "Science",
+    description: "Subject-focused intermediate preparation for Science students.",
+    icon: Microscope,
+  },
+  {
+    id: "xi-xii-commerce",
+    title: "XI-XII Commerce",
+    level: "Intermediate",
+    stream: "Commerce",
+    description: "Organized Commerce preparation supported by experienced faculty.",
+    icon: BriefcaseBusiness,
+  },
+  {
+    id: "computer-science",
+    title: "Computer Science",
+    level: "Secondary & Intermediate",
+    stream: "Computer Science",
+    description: "Curriculum-focused preparation for students selecting Computer Science.",
+    icon: Laptop,
+  },
+  {
+    id: "pre-engineering",
+    title: "Pre-Engineering",
+    level: "Intermediate",
+    stream: "Pre-Engineering",
+    description: "Focused support for the core subjects in the Pre-Engineering stream.",
+    icon: Calculator,
+  },
+  {
+    id: "iv-viii",
+    title: "Grades IV-VIII",
+    level: "Foundation",
+    stream: "General",
+    description: "A strong academic foundation through focused curriculum and regular attention.",
+    icon: GraduationCap,
+  },
+  {
+    id: "huffaz-programme",
+    title: "Huffaz Programme",
+    level: "Formal education",
+    stream: "Huffaz",
+    description: "Hafiz to Formal Education Programme, including a crash course for Huffaz.",
+    icon: BrainCircuit,
+  },
+] as const;
+
+export const campuses = [
+  {
+    id: "boys",
+    name: "Boys Campus",
+    shortName: "Boys",
+    phones: ["0300-2320599", "0334-2320594"],
+    whatsapp: "923002320599",
+    address: "SA 24/1 Block #05, K.A.E.C.H.S, near Bin Ahmed Supermarket, Karachi",
+    accent: "navy",
+  },
+  {
+    id: "girls",
+    name: "Girls Campus",
+    shortName: "Girls",
+    phones: ["0321-2484395"],
+    whatsapp: "923212484395",
+    address: "C-11 Commercial Block #02, K.A.E.C.H.S, Karachi",
+    accent: "burgundy",
+  },
+  {
+    id: "hill-park",
+    name: "Hill Park Campus",
+    shortName: "Hill Park",
+    phones: ["0323-1909072", "0323-1909062"],
+    whatsapp: "923231909072",
+    address: "22-Z Block #7-8, K.M.C.H.S Society, near Hill Park, Karachi",
+    accent: "gold",
+  },
+] as const;
+
+export const faculty = [
+  { name: "Sir Saqib Zaki", qualification: "CAT, B.Com, MBA", experience: 24, field: "Leadership & Commerce" },
+  { name: "Eng. Babar Ashraf", qualification: "BSEL", experience: 11, field: "Engineering" },
+  { name: "Sir Muhammad Armash", qualification: "MSc Applied Mathematics", experience: 11, field: "Mathematics" },
+  { name: "Sir Shahid Punal", qualification: "MSc Applied Mathematics", experience: 11, field: "Mathematics" },
+  { name: "Sir Hanzala Nauman", qualification: "BE Biomedical", experience: 8, field: "Biomedical Science" },
+  { name: "Sir Ashhad Sohail", qualification: "CA Finalist", experience: 8, field: "Commerce" },
+  { name: "Miss Javeria", qualification: "BS Bio-Sciences, MPhil Biotechnology ongoing", experience: 5, field: "Biological Sciences" },
+  { name: "Sir Hassan Haroon", qualification: "Pharma-D ongoing", experience: 5, field: "Life Sciences" },
+  { name: "Sir Hasan", qualification: "BSCS ongoing", experience: 3, field: "Computer Science" },
+] as const;
+
+export const results2026 = [
+  { src: "/assets/results/boys-matric-science-general-2026.webp", alt: "2026 boys campus SSC Part II Science and General high achievers", title: "Boys Matric - Science & General" },
+  { src: "/assets/results/girls-matric-general-2026.webp", alt: "2026 girls campus Matric General result highlight", title: "Girls Matric - General" },
+  { src: "/assets/results/girls-matric-science-2026.webp", alt: "2026 girls campus Matric Science result highlight", title: "Girls Matric - Science" },
+  { src: "/assets/results/girls-matric-science-2-2026.webp", alt: "Second 2026 girls campus Matric Science result highlight", title: "Girls Matric - Science II" },
+] as const;
+
+export const results2025 = [
+  { src: "/assets/results/boys-xi-xii-groups-2025.webp", alt: "2025 boys classes XI-XII group result highlights", title: "Boys XI-XII Groups" },
+  { src: "/assets/results/boys-ix-x-matric-2025.webp", alt: "2025 boys classes IX-X Matric result highlights", title: "Boys IX-X Matric" },
+  { src: "/assets/results/girls-xi-xii-groups-2025.webp", alt: "2025 girls classes XI-XII group result highlights", title: "Girls XI-XII Groups" },
+  { src: "/assets/results/girls-ix-x-matric-2025.webp", alt: "2025 girls classes IX-X Matric result highlights", title: "Girls IX-X Matric" },
+] as const;
+
+export type Timetable = {
+  id: string;
+  campus: "boys" | "girls";
+  classLevel: "9" | "10" | "11" | "12";
+  stream: "Science" | "General" | "Commerce";
+  variant: string;
+  src: string;
+};
+
+export const timetables: Timetable[] = [
+  { id: "b9ga", campus: "boys", classLevel: "9", stream: "General", variant: "Evening batch A", src: "/assets/timetables/boys/class-9-general-evening-batch-a.webp" },
+  { id: "b9gb", campus: "boys", classLevel: "9", stream: "General", variant: "Evening batch B", src: "/assets/timetables/boys/class-9-general-evening-batch-b.webp" },
+  { id: "b9gm", campus: "boys", classLevel: "9", stream: "General", variant: "Morning", src: "/assets/timetables/boys/class-9-general-morning.webp" },
+  { id: "b9sa", campus: "boys", classLevel: "9", stream: "Science", variant: "Batch A", src: "/assets/timetables/boys/class-9-science-batch-a.webp" },
+  { id: "b9sb", campus: "boys", classLevel: "9", stream: "Science", variant: "Batch B", src: "/assets/timetables/boys/class-9-science-batch-b.webp" },
+  { id: "b10ge", campus: "boys", classLevel: "10", stream: "General", variant: "Evening", src: "/assets/timetables/boys/class-10-general-evening.webp" },
+  { id: "b10gm", campus: "boys", classLevel: "10", stream: "General", variant: "Morning", src: "/assets/timetables/boys/class-10-general-morning.webp" },
+  { id: "b10sa", campus: "boys", classLevel: "10", stream: "Science", variant: "Batch A", src: "/assets/timetables/boys/class-10-science-batch-a.webp" },
+  { id: "b10sb", campus: "boys", classLevel: "10", stream: "Science", variant: "Batch B", src: "/assets/timetables/boys/class-10-science-batch-b.webp" },
+  { id: "b11ce", campus: "boys", classLevel: "11", stream: "Commerce", variant: "Evening", src: "/assets/timetables/boys/class-11-commerce-evening.webp" },
+  { id: "b11cm", campus: "boys", classLevel: "11", stream: "Commerce", variant: "Morning", src: "/assets/timetables/boys/class-11-commerce-morning.webp" },
+  { id: "b11s", campus: "boys", classLevel: "11", stream: "Science", variant: "Standard", src: "/assets/timetables/boys/class-11-science.webp" },
+  { id: "b12ce", campus: "boys", classLevel: "12", stream: "Commerce", variant: "Evening", src: "/assets/timetables/boys/class-12-commerce-evening.webp" },
+  { id: "b12cm", campus: "boys", classLevel: "12", stream: "Commerce", variant: "Morning", src: "/assets/timetables/boys/class-12-commerce-morning.webp" },
+  { id: "b12s", campus: "boys", classLevel: "12", stream: "Science", variant: "Standard", src: "/assets/timetables/boys/class-12-science.webp" },
+  { id: "g9g", campus: "girls", classLevel: "9", stream: "General", variant: "Standard", src: "/assets/timetables/girls/class-9-general.webp" },
+  { id: "g9s", campus: "girls", classLevel: "9", stream: "Science", variant: "Standard", src: "/assets/timetables/girls/class-9-science.webp" },
+  { id: "g10g", campus: "girls", classLevel: "10", stream: "General", variant: "Standard", src: "/assets/timetables/girls/class-10-general.webp" },
+  { id: "g10s", campus: "girls", classLevel: "10", stream: "Science", variant: "Standard", src: "/assets/timetables/girls/class-10-science.webp" },
+  { id: "g11c", campus: "girls", classLevel: "11", stream: "Commerce", variant: "Standard", src: "/assets/timetables/girls/class-11-commerce.webp" },
+  { id: "g11s", campus: "girls", classLevel: "11", stream: "Science", variant: "Standard", src: "/assets/timetables/girls/class-11-science.webp" },
+  { id: "g12c", campus: "girls", classLevel: "12", stream: "Commerce", variant: "Standard", src: "/assets/timetables/girls/class-12-commerce.webp" },
+  { id: "g12s", campus: "girls", classLevel: "12", stream: "Science", variant: "Standard", src: "/assets/timetables/girls/class-12-science.webp" },
+];
+
+export const mediaItems = [
+  { title: "Academy introduction", description: "An introduction to Sir Saqib Tuitions and admissions.", src: "/assets/videos/intro/academy-intro.mp4", poster: "/assets/posters/current-facebook-poster.webp" },
+  { title: "Girls campus introduction", description: "A look at girls campus learning and admissions.", src: "/assets/videos/intro/girls-intro-results-admissions.mp4", poster: "/assets/posters/admission-girls-campus.webp" },
+  { title: "Classroom learning", description: "Real classroom teaching and student learning.", src: "/assets/videos/classroom/classroom-teaching-student-learning.mp4", poster: "/assets/posters/current-facebook-poster.webp" },
+  { title: "Boys campus classroom", description: "A real classroom view from the boys campus.", src: "/assets/videos/campus/boys-classroom.mp4", poster: "/assets/posters/admission-boys-campus.webp" },
+  { title: "2026 result highlights", description: "Matric Science high achievers from 2026.", src: "/assets/videos/results/matric-science-high-achievers-2026.mp4", poster: "/assets/results/boys-matric-science-general-2026.webp" },
+] as const;
+
+export const faqs = [
+  { question: "Which classes are offered?", answer: "Sir Saqib Tuitions offers tuition for Grades IV-VIII and Grades IX-XII." },
+  { question: "Which streams are available?", answer: "Available study paths include Science, General, Commerce, Computer Science and Pre-Engineering." },
+  { question: "Are there separate boys and girls campuses?", answer: "Yes. There are dedicated Boys and Girls campuses, along with the Hill Park Campus in Karachi." },
+  { question: "Is there a programme for Huffaz?", answer: "Yes. The academy offers a Hafiz to Formal Education Programme and a crash course for Huffaz." },
+  { question: "How can parents contact admissions?", answer: "Parents can call a campus directly or start a WhatsApp conversation using the contact options on this website. Fees, exact timings, registration documents and trial-class details should be confirmed with admissions." },
+] as const;
+
+export const assistantAnswers = {
+  Courses: "We offer Grades IV-VIII, IX-X Science and General, XI-XII Science and Commerce, Computer Science, Pre-Engineering, and the Huffaz Programme.",
+  Campuses: "There are three Karachi campuses: Boys Campus in K.A.E.C.H.S, Girls Campus in K.A.E.C.H.S, and Hill Park Campus near Hill Park.",
+  Timetables: "Use the Timetables page to filter the real posters by Boys or Girls, class and stream. Confirm any last-minute changes with the campus.",
+  Admissions: "Admissions are open. For fees, exact timings, required documents or trial-class details, contact admissions directly because those details are not published here.",
+  Contact: "Call 0300-2320599 or choose a campus on the Contact page for its phone, WhatsApp and map options.",
+} as const;
+
+export const buildingIcon = Building2;
