@@ -14,6 +14,8 @@ next-env.d.ts
 # Environment files
 .env*
 !.env.example
+# Explicitly document the local secret file (also covered by .env* above).
+/.env.local
 
 # Logs and OS files
 npm-debug.log*

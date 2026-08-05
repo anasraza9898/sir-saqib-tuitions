@@ -241,6 +241,72 @@ export const timetables: Timetable[] = [
   { id: "g12s", campus: "girls", classLevel: "12", stream: "Science", variant: "Standard", src: "/assets/timetables/girls/class-12-science.webp" },
 ];
 
+export type TimetableSlot = { start: string; end: string; subject: string };
+export type TimetableDay = { day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday"; slots: TimetableSlot[]; note?: string };
+
+/**
+ * Verified transcription of the published Class IX timetable posters. Other
+ * posters remain safely addressable through the normalized `timetables` index
+ * and are shown on the filtered timetable route rather than being guessed.
+ */
+export const timetableSchedules: Readonly<Record<string, readonly TimetableDay[]>> = {
+  b9sa: [
+    { day: "Monday", slots: [{ start: "4:30 PM", end: "5:15 PM", subject: "Maths" }, { start: "5:15 PM", end: "6:00 PM", subject: "Physics" }, { start: "6:00 PM", end: "6:15 PM", subject: "English" }] },
+    { day: "Tuesday", slots: [{ start: "4:00 PM", end: "4:45 PM", subject: "Test" }, { start: "4:45 PM", end: "5:30 PM", subject: "Physics" }, { start: "5:30 PM", end: "6:15 PM", subject: "Maths" }] },
+    { day: "Wednesday", slots: [{ start: "4:30 PM", end: "5:15 PM", subject: "Maths" }, { start: "5:15 PM", end: "6:00 PM", subject: "Physics" }, { start: "6:00 PM", end: "6:15 PM", subject: "Urdu" }] },
+    { day: "Thursday", slots: [{ start: "4:00 PM", end: "4:45 PM", subject: "Test" }, { start: "4:45 PM", end: "5:30 PM", subject: "Chemistry" }, { start: "5:30 PM", end: "6:15 PM", subject: "Computer / Biology" }] },
+    { day: "Friday", slots: [{ start: "4:15 PM", end: "4:45 PM", subject: "Islamiat" }, { start: "4:45 PM", end: "5:30 PM", subject: "Chemistry" }, { start: "5:30 PM", end: "6:15 PM", subject: "Computer / Biology" }] },
+    { day: "Saturday", slots: [], note: "Weekly grand test: 12:30-1:30 PM or 4:30-5:30 PM" },
+  ],
+  b9sb: [
+    { day: "Monday", slots: [{ start: "6:15 PM", end: "7:00 PM", subject: "Physics" }, { start: "7:00 PM", end: "7:45 PM", subject: "Maths" }, { start: "7:45 PM", end: "8:15 PM", subject: "English" }] },
+    { day: "Tuesday", slots: [{ start: "6:15 PM", end: "7:00 PM", subject: "Physics" }, { start: "7:00 PM", end: "7:45 PM", subject: "Maths" }, { start: "7:45 PM", end: "8:15 PM", subject: "Test" }] },
+    { day: "Wednesday", slots: [{ start: "6:15 PM", end: "7:00 PM", subject: "Physics" }, { start: "7:00 PM", end: "7:45 PM", subject: "Maths" }, { start: "7:45 PM", end: "8:15 PM", subject: "Urdu" }] },
+    { day: "Thursday", slots: [{ start: "5:30 PM", end: "6:15 PM", subject: "Biology" }, { start: "6:15 PM", end: "7:00 PM", subject: "Chemistry" }, { start: "7:00 PM", end: "7:45 PM", subject: "Test" }, { start: "7:45 PM", end: "8:15 PM", subject: "Computer" }] },
+    { day: "Friday", slots: [{ start: "5:30 PM", end: "6:15 PM", subject: "Biology" }, { start: "6:15 PM", end: "7:00 PM", subject: "Chemistry" }, { start: "7:00 PM", end: "7:45 PM", subject: "Islamiat" }, { start: "7:45 PM", end: "8:15 PM", subject: "Computer" }] },
+    { day: "Saturday", slots: [], note: "Weekly grand test: 12:30-1:30 PM or 4:30-5:30 PM" },
+  ],
+  b9gm: [
+    { day: "Monday", slots: [{ start: "11:15 AM", end: "12:00 PM", subject: "Maths" }, { start: "12:00 PM", end: "12:30 PM", subject: "Economics" }, { start: "12:30 PM", end: "1:15 PM", subject: "English" }] },
+    { day: "Tuesday", slots: [{ start: "11:15 AM", end: "12:00 PM", subject: "Maths" }, { start: "12:00 PM", end: "12:30 PM", subject: "Economics" }, { start: "12:30 PM", end: "1:15 PM", subject: "Test" }] },
+    { day: "Wednesday", slots: [{ start: "11:15 AM", end: "12:00 PM", subject: "Civics" }, { start: "12:00 PM", end: "12:30 PM", subject: "Islamiat" }, { start: "12:30 PM", end: "1:15 PM", subject: "Science" }] },
+    { day: "Thursday", slots: [{ start: "11:15 AM", end: "12:00 PM", subject: "Science" }, { start: "12:00 PM", end: "12:30 PM", subject: "Civics" }, { start: "12:30 PM", end: "1:15 PM", subject: "Test" }] },
+    { day: "Friday", slots: [{ start: "11:15 AM", end: "12:00 PM", subject: "Islamiat" }, { start: "12:00 PM", end: "12:30 PM", subject: "Urdu" }] },
+    { day: "Saturday", slots: [], note: "Weekly grand test: 11:30 AM-12:30 PM or 5:30-6:30 PM" },
+  ],
+  b9ga: [
+    { day: "Monday", slots: [{ start: "4:30 PM", end: "5:15 PM", subject: "Maths" }, { start: "5:15 PM", end: "5:45 PM", subject: "Economics" }, { start: "5:45 PM", end: "6:15 PM", subject: "English" }] },
+    { day: "Tuesday", slots: [{ start: "4:30 PM", end: "5:15 PM", subject: "Maths" }, { start: "5:15 PM", end: "5:45 PM", subject: "Economics" }, { start: "5:45 PM", end: "6:15 PM", subject: "Test" }] },
+    { day: "Wednesday", slots: [{ start: "4:30 PM", end: "5:15 PM", subject: "Civics" }, { start: "5:15 PM", end: "5:45 PM", subject: "Islamiat" }, { start: "5:45 PM", end: "6:15 PM", subject: "Science" }] },
+    { day: "Thursday", slots: [{ start: "4:30 PM", end: "5:15 PM", subject: "Science" }, { start: "5:15 PM", end: "5:45 PM", subject: "Civics" }, { start: "5:45 PM", end: "6:15 PM", subject: "Test" }] },
+    { day: "Friday", slots: [{ start: "4:30 PM", end: "5:15 PM", subject: "Islamiat" }, { start: "5:15 PM", end: "5:45 PM", subject: "Urdu" }] },
+    { day: "Saturday", slots: [], note: "Weekly grand test: 11:30 AM-12:30 PM or 5:30-6:30 PM" },
+  ],
+  b9gb: [
+    { day: "Monday", slots: [{ start: "6:15 PM", end: "7:00 PM", subject: "Maths" }, { start: "7:00 PM", end: "7:30 PM", subject: "Economics" }, { start: "7:30 PM", end: "8:15 PM", subject: "English" }] },
+    { day: "Tuesday", slots: [{ start: "6:15 PM", end: "7:00 PM", subject: "Maths" }, { start: "7:00 PM", end: "7:30 PM", subject: "Economics" }, { start: "7:30 PM", end: "8:15 PM", subject: "Test" }] },
+    { day: "Wednesday", slots: [{ start: "6:15 PM", end: "7:00 PM", subject: "Civics" }, { start: "7:00 PM", end: "7:30 PM", subject: "Islamiat" }, { start: "7:30 PM", end: "8:15 PM", subject: "Science" }] },
+    { day: "Thursday", slots: [{ start: "6:15 PM", end: "7:00 PM", subject: "Science" }, { start: "7:00 PM", end: "7:30 PM", subject: "Civics" }, { start: "7:30 PM", end: "8:15 PM", subject: "Test" }] },
+    { day: "Friday", slots: [{ start: "6:15 PM", end: "7:00 PM", subject: "Islamiat" }, { start: "7:00 PM", end: "7:30 PM", subject: "Urdu" }] },
+    { day: "Saturday", slots: [], note: "Weekly grand test: 11:30 AM-12:30 PM or 5:30-6:30 PM" },
+  ],
+  g9s: [
+    { day: "Monday", slots: [{ start: "4:30 PM", end: "6:00 PM", subject: "Chemistry" }] },
+    { day: "Tuesday", slots: [{ start: "4:30 PM", end: "5:15 PM", subject: "Physics" }, { start: "5:15 PM", end: "6:00 PM", subject: "Maths" }] },
+    { day: "Wednesday", slots: [{ start: "4:30 PM", end: "5:15 PM", subject: "Physics" }, { start: "5:15 PM", end: "6:00 PM", subject: "Maths" }] },
+    { day: "Thursday", slots: [{ start: "4:30 PM", end: "6:00 PM", subject: "Compulsory subjects (English / Urdu / Islamiat)" }] },
+    { day: "Friday", slots: [{ start: "3:00 PM", end: "4:30 PM", subject: "Computer / Biology" }] },
+    { day: "Saturday", slots: [{ start: "12:00 PM", end: "1:00 PM", subject: "Extra class (if needed)" }] },
+  ],
+  g9g: [
+    { day: "Monday", slots: [], note: "Off" },
+    { day: "Tuesday", slots: [{ start: "3:00 PM", end: "3:45 PM", subject: "Maths" }, { start: "3:45 PM", end: "4:30 PM", subject: "Economics" }] },
+    { day: "Wednesday", slots: [{ start: "3:00 PM", end: "3:45 PM", subject: "Maths" }, { start: "3:45 PM", end: "4:30 PM", subject: "Science / Economics" }] },
+    { day: "Thursday", slots: [{ start: "4:30 PM", end: "6:00 PM", subject: "Compulsory subjects (English / Urdu / Islamiat)" }] },
+    { day: "Friday", slots: [{ start: "3:00 PM", end: "4:30 PM", subject: "Civics / Computer" }] },
+  ],
+};
+
 export type MediaItem = {
   id: string;
   category: "Academy Introduction" | "Girls Campus" | "Boys Campus" | "Classroom Learning" | "Results" | "Testimonials";
