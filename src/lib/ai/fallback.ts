@@ -49,10 +49,20 @@ function fallbackMessage(message: string, language: AssistantLanguage, state: Le
       if (context.missingClarification.length) return roman
         ? `Jee, ${context.missingClarification.join(", ")} bata dein taake exact class timetable mil sake.`
         : `Please share ${context.missingClarification.join(", ")} so I can identify the exact class timetable.`;
-      if (context.facts.length > 2 && !context.facts.some((fact) => fact.includes("not been safely transcribed"))) {
-        return `${roman ? "Jee, verified schedule:" : "Here is the verified schedule:"}\n${context.facts.join("\n")}`;
+      if (context.facts.length) {
+        const posterFact = context.facts.find((fact) => fact.startsWith("Official timetable poster:"));
+        const unparsed = context.facts.some((fact) => /structured timetable text has not been installed/i.test(fact));
+        if (posterFact && unparsed) {
+          const label = posterFact.replace(/^Official timetable poster:\s*/i, "").replace(/\.$/, "");
+          return roman
+            ? `Jee, exact official timetable poster ${label} ke liye available hai. Day/time text safely transcribe nahin hai, is liye timetable button se poster open kar lein.`
+            : `The exact official timetable poster is available for ${label}. The day/time text has not been safely transcribed, so please open the timetable poster.`;
+        }
+        return `${roman ? "Jee, verified timetable detail:" : "Here is the verified timetable detail:"}\n${context.facts.join("\n")}`;
       }
-      return roman ? "Exact verified timetable poster neeche diye gaye action se khol sakte hain." : "You can open the exact verified timetable poster using the action below.";
+      return roman
+        ? "Updated timetable finalise ho raha hai. Aap campus select kar dein, main aapko relevant admissions contact ya updated timetable section tak guide kar deta hoon."
+        : "The updated timetable is being finalized. Select the campus and I can guide you to the relevant admissions contact or updated timetable section.";
     case "out_of_scope":
       return roman ? "Main medical, legal ya financial advice nahin de sakta. Academy ke admissions, classes ya campuses ke hawalay se zaroor madad kar sakta hoon." : "I cannot provide medical, legal or financial advice. I can help with the academy's admissions, classes or campuses.";
     case "lead_callback":

@@ -16,8 +16,9 @@ import {
   leadSchema,
   type LeadDraft,
 } from "@/lib/ai/lead";
+import { WhatsAppChooserButton } from "@/components/whatsapp-campus-chooser";
 import { site } from "@/data/site";
-import { telHref, whatsappHref } from "@/lib/utils";
+import { telHref } from "@/lib/utils";
 
 type LeadFormValues = {
   name: string;
@@ -93,10 +94,7 @@ export function AdmissionLeadForm({
   const completion = getLeadCompletionPercentage(values as LeadDraft);
   const steps = roman ? ["Aapki details", "Student", "Preference aur consent"] : ["Your details", "Student", "Preferences & consent"];
 
-  const whatsapp = useMemo(() => {
-    const message = buildWhatsAppLeadMessage(language, values);
-    return whatsappHref(site.whatsapp, message);
-  }, [language, values]);
+  const whatsappMessage = useMemo(() => buildWhatsAppLeadMessage(language, values), [language, values]);
 
   function update<K extends keyof LeadFormValues>(field: K, value: LeadFormValues[K]) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -202,7 +200,7 @@ export function AdmissionLeadForm({
           ) : null}
           <div className="mt-6 grid gap-2 sm:grid-cols-2">
             <a href={telHref(site.admissionsPhone)} className="button-paper"><Phone size={16} /> {roman ? "Call karein" : "Call admissions"}</a>
-            <a href={whatsapp} target="_blank" rel="noreferrer" className="button-ink"><MessageCircle size={16} /> WhatsApp</a>
+            <WhatsAppChooserButton message={whatsappMessage} className="button-ink"><MessageCircle size={16} /> WhatsApp</WhatsAppChooserButton>
           </div>
           <button type="button" onClick={onBack} className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-muted hover:text-ink"><ArrowLeft size={14} /> {roman ? "Chat par wapas" : "Back to assistant"}</button>
         </div>
@@ -278,7 +276,7 @@ export function AdmissionLeadForm({
             <div role="alert" className="mt-5 border-l-2 border-girls bg-paper px-4 py-3 text-xs leading-5 text-girls">
               <p>{submitError}</p>
               <p className="mt-1 text-muted">{roman ? "Enquiry save hone ki tasdeeq nahin hui. Dobara try karein ya WhatsApp par details bhej dein." : "The enquiry was not confirmed as saved. Retry, or send the details through WhatsApp."}</p>
-              <a href={whatsapp} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 font-bold text-[#176b50]"><MessageCircle size={13} /> WhatsApp</a>
+              <WhatsAppChooserButton message={whatsappMessage} className="mt-2 inline-flex items-center gap-1 font-bold text-[#176b50]"><MessageCircle size={13} /> WhatsApp</WhatsAppChooserButton>
             </div>
           ) : null}
         </motion.div>

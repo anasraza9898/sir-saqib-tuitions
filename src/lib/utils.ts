@@ -7,8 +7,10 @@ export function telHref(phone: string) {
 }
 
 export function whatsappHref(phone: string, message?: string) {
+  const digits = phone.replace(/\D/g, "");
+  const normalized = digits.startsWith("0") ? `92${digits.slice(1)}` : digits;
   const query = message ? `?text=${encodeURIComponent(message)}` : "";
-  return `https://wa.me/${phone}${query}`;
+  return `https://wa.me/${normalized}${query}`;
 }
 
 export function mapHref(address: string) {

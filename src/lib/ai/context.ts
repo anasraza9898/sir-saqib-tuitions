@@ -47,17 +47,18 @@ export function extractConversationState(messages: ChatMessage[], supplied: Lead
     if (/\bscience\b/i.test(text)) update.stream = "Science";
     else if (/\bgeneral\b/i.test(text)) update.stream = "General";
     else if (/\bcommerce\b/i.test(text)) update.stream = "Commerce";
-    else if (/\bcomputer(?: science)?\b/i.test(text)) update.stream = "Computer Science";
+    else if (/\bgeneral science\b/i.test(text)) update.stream = "General Science";
+    else if (/\bcomputer(?: science)?\b/i.test(text)) update.stream = "General Science";
     else if (/\bpre[ -]?engineering\b/i.test(text)) update.stream = "Pre-Engineering";
     else if (/\b(?:sindh board|matric board)\b/i.test(text)) update.stream = "Sindh Board";
     else if (/\b(?:caie|cambridge)\b/i.test(text)) update.stream = "Cambridge/CAIE";
 
-    if (/\b(?:girls? campus|female campus|beti|daughter|larki|girl student)\b/i.test(text)) {
+    if (/\b(?:girls? campus|girls?|female campus|beti|daughter|larki|girl student)\b/i.test(text)) {
       update.studentGender = "Girl";
-      if (/\bcampus\b/i.test(text)) update.preferredCampus = "Girls Campus";
-    } else if (/\b(?:boys? campus|male campus|beta|son|larka|boy student)\b/i.test(text)) {
+      if (/\bcampus\b/i.test(text) || /^girls?\.?$/i.test(text.trim())) update.preferredCampus = "Girls Campus";
+    } else if (/\b(?:boys? campus|boys?|male campus|beta|son|larka|boy student)\b/i.test(text)) {
       update.studentGender = "Boy";
-      if (/\bcampus\b/i.test(text)) update.preferredCampus = "Boys Campus";
+      if (/\bcampus\b/i.test(text) || /^boys?\.?$/i.test(text.trim())) update.preferredCampus = "Boys Campus";
     }
     if (/\bhill[ -]?park(?: campus)?\b/i.test(text)) update.preferredCampus = "Hill Park Campus";
 

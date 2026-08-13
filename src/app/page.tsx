@@ -9,7 +9,7 @@ import { HomeHero } from "@/components/home-hero";
 import { MotionReveal, MotionSection, MotionStagger, MotionStaggerItem } from "@/components/motion-system";
 import { PremiumVideo } from "@/components/premium-video";
 import { SectionHeading } from "@/components/section-heading";
-import { campuses, faqs, site } from "@/data/site";
+import { campuses, faqs, mediaItems, missionVision, site } from "@/data/site";
 import { telHref } from "@/lib/utils";
 
 const ProgramExplorer = dynamic(() => import("@/components/program-explorer").then((module) => module.ProgramExplorer));
@@ -25,6 +25,9 @@ const benefits = [
 ];
 
 export default function HomePage() {
+  const classroomMedia = mediaItems.find((item) => item.id === "classroom-learning");
+  const boysCampusMedia = mediaItems.find((item) => item.id === "boys-campus");
+  const testimonialsMedia = mediaItems.find((item) => item.id === "student-voices");
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -34,6 +37,23 @@ export default function HomePage() {
   return (
     <>
       <HomeHero />
+
+      <MotionSection className="border-b border-cream-deep bg-paper py-12">
+        <div className="container-wide grid gap-4 lg:grid-cols-2">
+          <MotionReveal className="border-l border-gold bg-cream px-5 py-6">
+            <p className="eyebrow text-girls">Our Mission</p>
+            <h2 className="mt-4 font-display text-3xl leading-tight text-ink">{missionVision.mission.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-muted">{missionVision.mission.body}</p>
+            <Link href="/about/mission" className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-ink hover:text-girls">Read mission <ArrowRight size={15} /></Link>
+          </MotionReveal>
+          <MotionReveal delay={0.08} className="border-l border-gold bg-ink px-5 py-6 text-white">
+            <p className="eyebrow text-gold-light">Our Vision</p>
+            <h2 className="mt-4 font-display text-3xl leading-tight">{missionVision.vision.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-white/64">{missionVision.vision.body}</p>
+            <Link href="/about/vision" className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-gold-light">Read vision <ArrowRight size={15} /></Link>
+          </MotionReveal>
+        </div>
+      </MotionSection>
 
       <MotionSection className="section-space bg-paper">
         <div className="container-wide grid gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-20">
@@ -65,14 +85,14 @@ export default function HomePage() {
 
       <section className="section-space bg-paper">
         <div className="container-wide">
-          <div className="flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between"><SectionHeading number="03" eyebrow="Karachi campuses" title="Three locations, one focused standard." description="Choose the campus that works for your family, then call, message or open the address in Maps." /><Link href="/campuses" className="button-paper shrink-0">Compare campuses <ArrowRight size={16} /></Link></div>
-          <MotionStagger className="mt-10 grid gap-4 lg:grid-cols-3">{campuses.map((campus, index) => <MotionStaggerItem key={campus.id}><CampusCard campus={campus} index={`0${index + 1}`} /></MotionStaggerItem>)}</MotionStagger>
+          <div className="flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between"><SectionHeading number="03" eyebrow="Our locations" title="Three locations, one focused standard." description="Choose the campus most convenient for the student, then connect directly through call, WhatsApp or map for admission guidance." /><Link href="/campuses" className="button-paper shrink-0">Compare campuses <ArrowRight size={16} /></Link></div>
+          <MotionStagger className="mt-10 grid auto-rows-fr items-stretch gap-4 lg:grid-cols-3">{campuses.map((campus, index) => <MotionStaggerItem key={campus.id} className="h-full"><CampusCard campus={campus} index={`0${index + 1}`} /></MotionStaggerItem>)}</MotionStagger>
         </div>
       </section>
 
       <section className="section-space bg-cream">
         <div className="container-wide">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between"><SectionHeading number="04" eyebrow="Faculty" title="Leadership first. Subject expertise throughout." description="Meet the instructors supporting Mathematics, Science, Commerce and Computer Science." /><Link href="/faculty" className="button-ink shrink-0">Complete faculty <ArrowRight size={16} /></Link></div>
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between"><SectionHeading number="04" eyebrow="Faculty" title="Leadership first. Subject expertise throughout." description="Meet the experienced educators guiding students across Mathematics, Science, Commerce and Computing with focused subject expertise and consistent academic support." /><Link href="/faculty" className="button-ink shrink-0">Complete faculty <ArrowRight size={16} /></Link></div>
           <div className="mt-10"><FacultyRoster compact /></div>
         </div>
       </section>
@@ -87,7 +107,7 @@ export default function HomePage() {
 
       <section className="section-space border-y border-cream-deep bg-cream">
         <div className="container-wide">
-          <SectionHeading number="06" eyebrow="Timetable finder" title="One clear poster at a time." description="Choose Boys or Girls, class, stream and batch. The finder keeps the selected timetable ready to zoom, download or confirm." />
+          <SectionHeading number="06" eyebrow="Timetable finder" title="Find your class timetable." description="Select a grade and programme to view the latest approved timetable poster." />
           <div className="mt-10"><TimetableExplorer compact /></div>
         </div>
       </section>
@@ -95,24 +115,23 @@ export default function HomePage() {
       <section className="section-space bg-paper">
         <div className="container-wide grid gap-12 lg:grid-cols-[0.68fr_1.32fr] lg:items-start">
           <div className="lg:sticky lg:top-24">
-            <SectionHeading number="07" eyebrow="Learning environment" title="See the focus inside the classroom." description="Real academy recordings show teaching, study space and the Boys Campus environment." />
+            <SectionHeading number="07" eyebrow="Learning environment" title="See the focus inside the classroom." description="Explore authentic classroom moments that reflect focused teaching, disciplined learning and an environment designed for student progress." />
             <ul className="mt-8 space-y-3">{["Focused classroom instruction", "Good study space", "Strict discipline", "Individual attention"].map((item) => <li key={item} className="flex items-center gap-3 text-sm font-bold text-text"><Check size={16} className="text-girls" />{item}</li>)}</ul>
             <Link href="/media" className="button-paper mt-7">Explore all media <ArrowRight size={16} /></Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-[1.2fr_0.8fr] sm:items-end">
-            <MotionReveal><PremiumVideo id="home-classroom" src="/assets/videos/classroom/classroom-teaching-student-learning.mp4" poster="/assets/posters/video/classroom-learning.webp" title="Classroom teaching and student learning" duration="0:25" label="Classroom Learning" className="aspect-[9/14]" /></MotionReveal>
-            <MotionReveal delay={0.1}><PremiumVideo id="home-boys-campus" src="/assets/videos/campus/boys-classroom.mp4" poster="/assets/posters/video/boys-campus-classroom.webp" title="Boys Campus learning environment" duration="1:10" label="Boys Campus" className="aspect-[9/14]" /></MotionReveal>
+          <div className="grid gap-4 sm:grid-cols-2 sm:items-start">
+            <MotionReveal><PremiumVideo id="home-classroom" src={classroomMedia?.src} poster={classroomMedia?.poster} title="Classroom teaching and student learning" duration={classroomMedia?.duration} label="Classroom Learning" className="aspect-[9/14]" /></MotionReveal>
+            <MotionReveal delay={0.1}><PremiumVideo id="home-boys-campus" src={boysCampusMedia?.src} poster={boysCampusMedia?.poster} title="Boys Campus learning environment" duration={boysCampusMedia?.duration} label="Boys Campus" className="aspect-[9/14]" /></MotionReveal>
           </div>
         </div>
       </section>
 
       <section className="section-space bg-navy text-white">
         <div className="container-wide grid gap-12 lg:grid-cols-[1.12fr_0.88fr] lg:items-center">
-          <MotionReveal className="mx-auto w-full max-w-xl border border-white/12 bg-ink p-2"><PremiumVideo id="home-testimonial" src="/assets/videos/testimonials/student-testimonials.mp4" poster="/assets/posters/video/student-testimonial.webp" title="Student testimonial recording" duration="1:31" label="Student Voices" className="aspect-[9/14] max-h-[680px]" /></MotionReveal>
+          <MotionReveal className="mx-auto w-full max-w-xl border border-white/12 bg-ink p-2"><PremiumVideo id="home-testimonial" src={testimonialsMedia?.src} poster={testimonialsMedia?.poster} title="Student testimonial recording" duration={testimonialsMedia?.duration} label="Student Voices" className="aspect-[9/14] max-h-[680px]" /></MotionReveal>
           <div>
             <SectionHeading number="08" eyebrow="Student voices" title="Hear the original experience, in the student's own words." description="Play the academy's real testimonial recording with sound." inverse />
             <div className="mt-8 grid gap-px bg-white/12 sm:grid-cols-2"><div className="bg-ink p-5"><p className="font-display text-3xl text-gold-light">24 years</p><p className="mt-2 text-xs font-bold uppercase text-white/50">Academic leadership</p></div><div className="bg-ink p-5"><p className="font-display text-3xl text-gold-light">3 campuses</p><p className="mt-2 text-xs font-bold uppercase text-white/50">Across Karachi</p></div></div>
-            <p className="mt-5 text-xs leading-5 text-white/45">A written transcript is not yet available for this recording.</p>
           </div>
         </div>
       </section>
@@ -121,7 +140,7 @@ export default function HomePage() {
 
       <section className="section-space bg-cream">
         <div className="container-wide grid gap-10 lg:grid-cols-[0.7fr_1.3fr]">
-          <div><SectionHeading number="09" eyebrow="Parent questions" title="Clear answers before you contact admissions." description="Start with the essentials, then speak directly with the campus for current guidance." /></div>
+          <div><SectionHeading number="09" eyebrow="Parents questions" title="Clear answers before you contact admissions." description="Start with the essentials, then speak directly with the campus for current guidance." /></div>
           <FaqList />
         </div>
       </section>

@@ -28,7 +28,7 @@ import {
   LEADS_APPEND_RANGE,
   leadToSheetRow,
 } from "../src/lib/leads/google-sheets-adapter.ts";
-import { timetableSchedules } from "../src/data/site.ts";
+import { campuses, programs, results2025, results2026, timetableSchedules, timetables } from "../src/data/site.ts";
 
 const validLead = {
   name: "Ayesha Khan",
@@ -103,7 +103,7 @@ test("uses intent only for fact selection and distinguishes class timing from en
   assert.equal(classifyAdmissionsIntent("Boys Campus enquiry timing kya hai?").intent, "campus_enquiry_hours");
   assert.equal(classifyAdmissionsIntent("I am interested in Class 9 fees.").intent, "fee");
   const timing = selectRelevantKnowledge("Class 9 ki timing kya hai?");
-  assert.deepEqual(timing.missingClarification, ["Boys or Girls Campus", "stream/group"]);
+  assert.deepEqual(timing.missingClarification, ["campus/gender (Boys or Girls)", "programme (General, Science or Commerce)"]);
   assert.doesNotMatch(timing.facts.join(" "), /11:00 AM-1:00 PM/);
 });
 
@@ -113,29 +113,30 @@ test("asks for a class on a vague fee quick action instead of dumping every fee"
   assert.doesNotMatch(context.facts.join(" "), /Grades XI-XII|O Levels/);
 });
 
-test("returns the exact verified Boys Class 9 Science Group A schedule context", () => {
-  const context = selectRelevantKnowledge("Boys Class 9 Science Group A ki timing?", {});
+test("keeps final timetable slots but does not quote retired schedule text", () => {
+  const context = selectRelevantKnowledge("Class 9 Science Group A ki timing?", {});
   assert.equal(context.missingClarification.length, 0);
-  assert.match(context.facts.join("\n"), /Monday: 4:30 PM-5:15 PM Maths/i);
-  assert.match(context.facts.join("\n"), /Saturday: Weekly grand test/i);
-  assert.match(context.recommendedAction.value, /batch=b9sa/);
-  assert.equal(timetableSchedules.b9sa.length, 6);
+  assert.match(context.facts.join("\n"), /Official timetable poster: Grade IX, Science, Group A/i);
+  assert.match(context.facts.join("\n"), /Updated structured timetable text has not been installed/i);
+  assert.doesNotMatch(context.facts.join("\n"), /Monday: 4:30 PM/i);
+  assert.match(context.recommendedAction.value, /batch=ix-science-group-a/);
+  assert.equal(timetableSchedules["ix-science-group-a"], undefined);
+  assert.equal(timetables.length, 14);
 });
 
-test("retains class, stream and campus across chronological follow-ups", () => {
+test("retains timetable intent and does not repeat answered clarification", () => {
   const messages: ChatMessage[] = [
-    { role: "user", content: "Class 9 Science ki timing?" },
-    { role: "assistant", content: "Which campus?" },
-    { role: "user", content: "Boys Campus." },
-    { role: "assistant", content: "Which group?" },
-    { role: "user", content: "Group A." },
+    { role: "user", content: "Class 9 ki timetable?" },
+    { role: "assistant", content: "Which programme?" },
+    { role: "user", content: "Science" },
   ];
   const state = extractConversationState(messages);
   const context = selectRelevantKnowledge(messages.at(-1)!.content, state);
   assert.equal(state.classLevel, "Grade IX");
   assert.equal(state.stream, "Science");
-  assert.equal(state.preferredCampus, "Boys Campus");
-  assert.match(context.recommendedAction.value, /batch=b9sa/);
+  assert.equal(context.intent, "class_schedule");
+  assert.deepEqual(context.missingClarification, []);
+  assert.match(context.recommendedAction.value, /batch=ix-science-group-a/);
 });
 
 test("later corrections replace earlier conversation state", () => {
@@ -159,6 +160,28 @@ test("selects only verified faculty, results and media facts", () => {
   const results = selectRelevantKnowledge("Latest results dikhao");
   assert.equal(results.recommendedAction.value, "/results");
   assert.match(results.facts.join(" "), /2026/);
+});
+
+test("uses official campus contacts and removes obsolete Boys number", () => {
+  const allContacts = campuses.flatMap((campus) => campus.contacts.map((contact) => `${contact.name} ${contact.phone} ${contact.whatsapp}`)).join(" ");
+  assert.match(allContacts, /Sir Saqib Zaki 0300-2320599/);
+  assert.match(allContacts, /Mrs\. Nousheen 0321-2484395/);
+  assert.match(allContacts, /Sir Ashhad Sohail 0323-1909072/);
+  assert.match(allContacts, /Sir Hanzala Nouman 0323-1909062/);
+  assert.doesNotMatch(JSON.stringify(campuses), new RegExp(["0334", "2320594"].join("-")));
+  assert.equal(campuses.find((campus) => campus.id === "hill-park")?.accent, "hill");
+});
+
+test("uses updated programme and result naming", () => {
+  const titles = programs.map((program) => program.title);
+  assert.deepEqual(titles.filter((title) => title.startsWith("XI-XII")), [
+    "XI-XII Pre-Medical",
+    "XI-XII Pre-Engineering",
+    "XI-XII General Science",
+    "XI-XII Commerce",
+  ]);
+  assert.ok(results2026.every((item) => !/^(Boys|Girls) Matric/.test(item.title)));
+  assert.ok([...results2026, ...results2025].every((item) => /Campus/.test(item.title)));
 });
 
 test("limits van claims to KAECHS and routes unknown areas for confirmation", () => {
@@ -233,7 +256,7 @@ test("recovers Gemini textual message when the structured envelope is malformed"
 test("rejects unsafe actions but preserves filtered timetable routes", () => {
   const valid = {
     message: "Open the exact timetable.",
-    recommendedAction: { type: "route", label: "Open", value: "/timetables?campus=boys&class=9&stream=science&batch=b9sa" },
+    recommendedAction: { type: "route", label: "Open", value: "/timetables?class=9&stream=science&batch=ix-science-group-a" },
   };
   const parsed = parseGeminiStructuredResponse(JSON.stringify(valid), "en", fallbackResponse());
   assert.equal(parsed.response.recommendedAction.type, "route");

@@ -9,13 +9,11 @@ export function PageHero({ title, description, path, children, tone = "ink", ind
   const inverse = tone === "ink";
   return (
     <section className={cn("relative overflow-hidden border-b", inverse ? "border-white/10 bg-ink text-white" : tone === "cream" ? "border-cream-deep bg-cream text-ink" : "border-cream-deep bg-paper text-ink")}>
-      <span className={cn("absolute right-[9%] top-0 h-full w-px", inverse ? "bg-gold/20" : "bg-gold/30")} aria-hidden="true" />
-      <span className={cn("absolute right-0 top-1/3 h-px w-1/4", inverse ? "bg-gold/20" : "bg-gold/30")} aria-hidden="true" />
       <div className="container-wide relative py-12 sm:py-16 lg:py-20">
         <Breadcrumbs current={title} path={path} inverse={inverse} />
-        <div className="mt-9 grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="mt-9 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_auto]">
           <MotionReveal className="max-w-4xl">
-            <div className="flex items-center gap-3"><span className={cn("font-display text-lg", inverse ? "text-gold-light" : "text-gold")}>{index}</span><span className={cn("h-px w-12", inverse ? "bg-white/25" : "bg-ink/20")} /></div>
+            {index ? <div className="flex items-center gap-3"><span className={cn("font-display text-lg", inverse ? "text-gold-light" : "text-gold")}>{index}</span><span className={cn("h-px w-12", inverse ? "bg-white/25" : "bg-ink/20")} /></div> : null}
             <h1 className="mt-5 font-display text-5xl leading-[1.02] sm:text-6xl lg:text-7xl">{title}</h1>
             <AnimatedUnderline className="mt-6 w-28" />
             <p className={cn("mt-6 max-w-2xl text-base leading-8 sm:text-lg", inverse ? "text-white/64" : "text-muted")}>{description}</p>

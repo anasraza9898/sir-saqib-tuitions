@@ -1,82 +1,114 @@
 # AI Conversation QA
 
-Date: 2026-08-04  
-Environment: local Next.js server (`http://127.0.0.1:3000`)  
+Date: 2026-08-13  
+Environment: local Next.js dev server at `http://127.0.0.1:3000`  
 Deployment: not performed
 
-## Root-cause audit
+## Root-Cause Audit
 
-The old response path built a deterministic keyword answer before calling Gemini. In `POST /api/ai/chat`, every recognized academy intent (`deterministic.intent !== "other"`) returned that local answer immediately. Gemini therefore handled almost none of the real admissions questions. The local lookup also returned broad, final-answer blocks (all fees, all programmes, all campuses), while Gemini's prompt injected the full knowledge base and required every schema field on every turn. These three choices caused unrelated information dumps, repetitive suggestions and robotic text.
+The unacceptable replies came from the assistant orchestration treating deterministic keyword/fact lookup as a reply brain. The broad local knowledge path selected large blocks such as all programmes, all fees, or generic campus/timetable guidance, then those blocks were used as final answers or as schema fallbacks. That made greetings, names, fee questions and timing questions behave like keyword matches instead of context-aware admissions conversation.
 
-The lead form and `/api/leads` validation were working, but the Sheets adapter collapsed all Google failures into `LEAD_STORAGE_FAILED`. Local credential checks found the three variables present. The key value also had a JSON-style trailing comma, which the new parser safely tolerates. After that normalization, Google authentication succeeded and spreadsheet metadata access returned `API_NOT_ENABLED` (HTTP 403). The Google Sheets API must be enabled in the service-account project before an append can succeed.
+The redesigned path keeps deterministic logic for validation, state extraction, security blocks, fact selection, exact fee calculation, action validation and provider-failure fallback. Gemini receives compact conversation state plus only the relevant verified facts for the latest turn, and Gemini composes the normal visible reply.
 
-## New response pipeline
+## Current Pipeline
 
-1. Validate a chronological recent transcript plus optional deterministic lead state.
-2. Extract only explicit visitor facts; later corrections override earlier state.
-3. Classify intent only to select relevant facts and a safe action.
-4. Supply Gemini with the selected facts, compact state and principle-based instructions.
-5. Let Gemini compose the natural final message through an optional-field JSON schema.
-6. Validate actions and lead updates. If JSON is malformed, retain a recoverable model message.
-7. Use deterministic conversation text only for prompt/safety blocks, missing Gemini configuration, provider/quota failure or infrastructure failure.
+1. Client sends the recent chronological transcript plus deterministic lead draft state.
+2. Route validates shape, rate limits and body size.
+3. Explicit visitor state is extracted: name, role, class, stream, gender/campus, timing preference and question.
+4. Intent classification selects relevant facts only; it does not produce the ordinary final reply.
+5. Gemini receives principle-based admissions instructions, compact state and the selected fact context.
+6. Structured output is optional except for `message`; Zod validates metadata and safe actions.
+7. If structured parsing fails, recover the textual model answer when possible.
+8. Deterministic text is used only for prompt/safety blocks, missing Gemini configuration, quota/provider failure, or infrastructure failure.
 
-## Live API test method
+## Timetable Handling
 
-`scripts/test-conversation-api.mjs` sent 34 real HTTP requests to `/api/ai/chat`, using the same chronological message shape as the browser. It covered independent questions and multi-turn histories. Checks included required facts, forbidden unrelated facts, action type/value, response length, language/script behavior and internal-context leakage.
+The current verified timetable source contains official poster records for Grades IX-XII, class, stream and variant. No verified machine-readable day/time transcription is installed in `timetableSchedules`, so the assistant must not quote days, subjects or times from memory or images.
 
-The initial burst reached Gemini and produced a natural name acknowledgement, then triggered the project's Gemini 429 quota. The final paced run completed **34/34 behavioral checks** through the designed provider-failure path because the project quota remained exhausted. Separately, `npm run test:gemini` confirmed both Gemini Interactions and `generateContent` work with `gemini-3.6-flash` before the quota was consumed. The quota condition is external and was not hidden.
+Behavior verified:
 
-## Per-message evaluation
+- `Class 9 ki timing kya hai?` asks only for missing campus/gender and programme.
+- `Boys Class 9 Science Group A ki timing?` returns the exact official poster route for `ix-science-group-a`.
+- General schedule questions with multiple variants ask for the missing batch/timing.
+- Campus enquiry hours remain separate from class timetables.
 
-| # | Case | Relevance/directness | Factual/context check | Result |
-|---:|---|---|---|---|
-| 1 | Roman Urdu name introduction | Natural acknowledgement; no programme dump | Remembered Anas | Pass |
-| 2 | English name introduction | Short conversational reply | Remembered Sarah | Pass |
-| 3 | Urdu-script greeting | Roman Urdu response | No Urdu script in output | Pass |
-| 4 | Class 9 fee | Fee first; no other programme list | PKR 5,000 + PKR 1,000 | Pass |
-| 5 | Misspelled Class 9 fee | Interpreted `clas`/`feee` | Same verified fee | Pass |
-| 6 | Urdu-script Class 9 fee | Interpreted Urdu input | Same verified fee, Roman output | Pass |
-| 7 | Class 9 starting total | Direct calculation | PKR 6,000 initial | Pass |
-| 8 | Sibling discount | Discount only | 10% monthly, not admission | Pass |
-| 9 | Ambiguous Class 9 timing | Asked only missing filters | Did not use office hours | Pass |
-| 10 | Boys IX Science Group A | Exact schedule + filtered route | Day/time/subject transcription | Pass |
-| 11 | Follow-up campus/group context | Used prior class/stream/campus | Resolved Group A | Pass |
-| 12 | Girls IX General schedule | Exact verified schedule | Correct filtered poster | Pass |
-| 13 | Boys enquiry hours | Office hours only | Correct Monday-Saturday hours | Pass |
-| 14 | Sunday hours | No invented opening time | WhatsApp confirmation action | Pass |
-| 15 | O Levels availability | Availability/curriculum only | All campuses, Cambridge/CAIE | Pass |
-| 16 | O Levels fee | Direct fee | PKR 8,000 + PKR 1,000 | Pass |
-| 17 | O Levels subjects | Direct subject scope | All subjects under CAIE | Pass |
-| 18 | Class 9 board | Board distinction retained | Sindh Board, not CAIE | Pass |
-| 19 | Sir Saqib experience | Direct biography facts | 24 years; CAT/B.Com/MBA | Pass |
-| 20 | Mathematics faculty | Only relevant faculty | Armash and Shahid | Pass |
-| 21 | Miss Javeria qualification | Only requested teacher | Verified qualification | Pass |
-| 22 | Van to Gulshan | No route invention | KAECHS-only confirmation | Pass |
-| 23 | Online classes | Direct availability answer | Not available; campus classes | Pass |
-| 24 | Trial/demo class | Direct availability answer | Not available | Pass |
-| 25 | Admission documents | No fabricated list | Confirmation action | Pass |
-| 26 | Latest results | Current verified year | 2026 categories + Results route | Pass |
-| 27 | Previous results | Requested year only | 2025 categories + Results route | Pass |
-| 28 | Classroom video | Brief media handoff | Media route | Pass |
-| 29 | Girls Campus address | One campus only | Verified address/phone | Pass |
-| 30 | Medical question | Polite scope boundary | No medication advice | Pass |
-| 31 | Prompt injection | Refused disclosure | No prompt/key leakage | Pass |
-| 32 | Serious callback intent | Form offered naturally | Consent required; no auto-save | Pass |
-| 33 | Repeated Class 9 fee | Concise repeat | No unrelated fee list | Pass |
-| 34 | Boys-to-Girls correction | Later correction honored | Girls IX Science route/schedule | Pass |
+## Faculty, Results And Media
 
-## Lead and Sheets verification
+Faculty answers are limited to the verified roster. Sir Saqib Zaki is answered as `CAT, B.Com, MBA` with 24 years of experience. Mathematics faculty returns Sir Muhammad Armash and Sir Shahid Punal only.
 
-- Credential presence: sheet ID `true`, service-account email `true`, private key `true`.
-- Required append range: `Leads!A:O`.
-- Sheets smoke result: `API_NOT_ENABLED`, HTTP 403, phase `spreadsheet_access`; no test row was appended.
-- Real local `/api/leads` submission: HTTP 502, `stored: false`, development status `rejected`, retryable `true`.
-- The UI shows success only for `stored: true`; otherwise it offers retry and WhatsApp.
+Results route to verified 2026 or 2025 result poster categories without inventing marks or guarantees. Media requests route to `/media` with relevant verified video categories such as Classroom Learning, Boys Campus, Results, Academy Introduction and Testimonials.
 
-## Command results
+## Live API QA
 
-- `npm test`: 23/23 pass.
-- `npm run test:gemini`: Interactions OK; `generateContent` OK (before quota exhaustion).
-- `npm run test:sheets`: expected external failure `API_NOT_ENABLED`.
-- `npm run lint`: no errors; final warning removed.
-- `npm run build`: pass; 14 routes generated, both API routes dynamic.
+Command: `node scripts/test-conversation-api.mjs`  
+Result: `34/34` passed.
+
+The first live requests reached Gemini successfully. During the burst test, Gemini returned sanitized `429 QUOTA_EXCEEDED` diagnostics, so later cases used the local emergency fallback. The fallback now preserves direct facts and safe actions instead of broad canned blocks.
+
+Covered cases:
+
+| # | Case | Result |
+|---:|---|---|
+| 1 | Roman Urdu name introduction | Pass |
+| 2 | English name introduction | Pass |
+| 3 | Urdu-script greeting with Roman Urdu output | Pass |
+| 4 | Class 9 fee | Pass |
+| 5 | Misspelled Class 9 fee | Pass |
+| 6 | Urdu-script Class 9 fee | Pass |
+| 7 | Class 9 starting total | Pass |
+| 8 | Sibling discount | Pass |
+| 9 | Ambiguous Class 9 timing | Pass |
+| 10 | Boys IX Science Group A poster route | Pass |
+| 11 | Follow-up class/stream/group timing context | Pass |
+| 12 | Girls IX General ambiguous variant | Pass |
+| 13 | Boys Campus enquiry hours | Pass |
+| 14 | Sunday hours confirmation | Pass |
+| 15 | O Levels availability | Pass |
+| 16 | O Levels fee | Pass |
+| 17 | O Levels subjects | Pass |
+| 18 | Class 9 board/curriculum | Pass |
+| 19 | Sir Saqib experience | Pass |
+| 20 | Mathematics faculty | Pass |
+| 21 | Miss Javeria qualification | Pass |
+| 22 | Van to Gulshan | Pass |
+| 23 | Online classes | Pass |
+| 24 | Trial/demo class | Pass |
+| 25 | Admission documents | Pass |
+| 26 | Latest results | Pass |
+| 27 | 2025 results | Pass |
+| 28 | Classroom video | Pass |
+| 29 | Girls Campus address | Pass |
+| 30 | Medical advice boundary | Pass |
+| 31 | Prompt injection | Pass |
+| 32 | Serious callback intent | Pass |
+| 33 | Repeated Class 9 fee | Pass |
+| 34 | Campus correction follow-up | Pass |
+
+## Google Sheets And Leads
+
+Credential presence from `.env.local` was reported as booleans only:
+
+- `GOOGLE_SHEET_ID`: true
+- `GOOGLE_SERVICE_ACCOUNT_EMAIL`: true
+- `GOOGLE_PRIVATE_KEY`: true
+
+Command: `npm run test:sheets`  
+Result: success. The script authenticated, verified spreadsheet access, verified the `Leads` tab, and appended to `Leads!A:O` with marker `TEST LEAD — DELETE ME`.
+
+Lead form API test:
+
+- Endpoint: `POST /api/leads`
+- Status: `200`
+- Response status: `submitted`
+- `stored`: true
+- `developmentStatus`: `stored`
+
+The current local root cause for "leads not appearing" is not a Sheets adapter failure. The confirmed behavior is that typing a name and phone in chat does not write a row. A row is written only after the guided lead form is submitted with valid required fields and explicit consent.
+
+## Command Results
+
+- `npm test`: 26/26 pass.
+- `npm run test:gemini`: Interactions OK; `generateContent` OK for `gemini-3.6-flash`.
+- `npm run test:sheets`: OK; appended test row to `Leads!A:O`.
+- `npm run lint`: pass.
+- `npm run build`: pass; 16 static pages generated, both API routes dynamic.

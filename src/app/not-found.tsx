@@ -5,11 +5,9 @@ import { ArrowRight, Home, MessageCircle } from "lucide-react";
 export default function NotFound() {
   return (
     <section className="relative flex min-h-[74svh] items-center overflow-hidden bg-cream py-16">
-      <span className="absolute left-[12%] top-0 h-full w-px bg-gold/25" aria-hidden="true" />
-      <span className="absolute right-0 top-1/3 h-px w-1/3 bg-gold/30" aria-hidden="true" />
       <div className="container-wide relative grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
         <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden border border-cream-deep bg-ink p-8 text-white">
-          <Image src="/assets/logo/sir-saqib-tuitions-logo.webp" alt="" width={72} height={72} className="h-16 w-16 object-contain" />
+          <Image src="/assets/logo/SST_Logo_T.b.png" alt="Sir Saqib Tuitions official logo" width={72} height={72} className="h-16 w-16 object-contain" />
           <p className="mt-14 font-display text-8xl text-gold-light">404</p>
           <p className="absolute bottom-8 left-8 right-8 border-t border-white/15 pt-5 text-xs font-bold uppercase text-white/58">Sir Saqib Tuitions / Karachi</p>
         </div>

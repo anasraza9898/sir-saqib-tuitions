@@ -7,8 +7,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, ChevronDown, Menu, MessageCircle, Phone, X } from "lucide-react";
 import { Modal } from "@/components/modal";
+import { WhatsAppChooserButton } from "@/components/whatsapp-campus-chooser";
 import { site } from "@/data/site";
-import { cn, telHref, whatsappHref } from "@/lib/utils";
+import { cn, telHref } from "@/lib/utils";
+
+const about = [
+  { label: "About", href: "/about", note: "Academy information" },
+  { label: "Our Mission", href: "/about/mission", note: "Purpose and academic support" },
+  { label: "Our Vision", href: "/about/vision", note: "Long-term student progress" },
+];
 
 const academics = [
   { label: "Courses", href: "/courses", note: "Programs and pathways" },
@@ -24,7 +31,7 @@ const explore = [
 
 const mobileItems = [
   { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
+  ...about.map(({ label, href }) => ({ label, href })),
   ...academics.map(({ label, href }) => ({ label, href })),
   ...explore.map(({ label, href }) => ({ label, href })),
   { label: "Contact", href: "/contact" },
@@ -35,7 +42,7 @@ export function SiteHeader() {
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [openGroup, setOpenGroup] = useState<"academics" | "explore" | null>(null);
+  const [openGroup, setOpenGroup] = useState<"about" | "academics" | "explore" | null>(null);
   const closeMobile = useCallback(() => setMenuOpen(false), []);
 
   useEffect(() => {
@@ -76,7 +83,7 @@ export function SiteHeader() {
     >
       <div className={cn("container-wide flex items-center justify-between gap-6 transition-[height] duration-300", scrolled ? "h-16" : "h-[76px]")}>
         <Link href="/" className="group flex min-w-0 items-center gap-3" aria-label={`${site.name} home`}>
-          <Image src="/assets/logo/sir-saqib-tuitions-logo.webp" alt="" width={52} height={52} priority className={cn("rounded-sm object-cover ring-1 transition-[width,height] duration-300", scrolled ? "h-10 w-10 ring-white/15" : "h-12 w-12 ring-ink/10")} />
+          <Image src="/assets/logo/SST_Logo_T.b.png" alt="Sir Saqib Tuitions official logo" width={52} height={52} priority className={cn("object-contain transition-[width,height] duration-300", scrolled ? "h-10 w-10" : "h-12 w-12")} />
           <span className="min-w-0">
             <span className="block truncate font-display text-xl text-current sm:text-2xl">{site.name}</span>
             <span className={cn("hidden text-[10px] font-bold uppercase transition-colors sm:block", lightText ? "text-gold-light" : "text-girls")}>Sound success in education</span>
@@ -85,7 +92,7 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
           <DirectLink href="/" label="Home" isActive={active("/")} light={lightText} />
-          <DirectLink href="/about" label="About" isActive={active("/about")} light={lightText} />
+          <NavGroup label="About" items={about} open={openGroup === "about"} active={about.some((item) => active(item.href))} light={lightText} onToggle={() => setOpenGroup((current) => current === "about" ? null : "about")} onClose={() => setOpenGroup(null)} />
           <NavGroup label="Academics" items={academics} open={openGroup === "academics"} active={academics.some((item) => active(item.href))} light={lightText} onToggle={() => setOpenGroup((current) => current === "academics" ? null : "academics")} onClose={() => setOpenGroup(null)} />
           <NavGroup label="Explore" items={explore} open={openGroup === "explore"} active={explore.some((item) => active(item.href))} light={lightText} onToggle={() => setOpenGroup((current) => current === "explore" ? null : "explore")} onClose={() => setOpenGroup(null)} />
           <DirectLink href="/contact" label="Contact" isActive={active("/contact")} light={lightText} />
@@ -105,7 +112,7 @@ export function SiteHeader() {
         <div id="mobile-navigation" className="flex min-h-full flex-col bg-cream">
           <div className="flex items-center justify-between border-b border-cream-deep px-5 py-4">
             <div className="flex items-center gap-3">
-              <Image src="/assets/logo/sir-saqib-tuitions-logo.webp" alt="" width={44} height={44} className="h-11 w-11 rounded-sm object-cover" />
+              <Image src="/assets/logo/SST_Logo_T.b.png" alt="Sir Saqib Tuitions official logo" width={44} height={44} className="h-11 w-11 object-contain" />
               <div><p id="mobile-menu-title" className="font-display text-2xl text-ink">Explore</p><p className="text-xs text-muted">Sir Saqib Tuitions</p></div>
             </div>
             <button type="button" className="icon-control" onClick={closeMobile} aria-label="Close navigation menu"><X size={20} /></button>
@@ -123,7 +130,7 @@ export function SiteHeader() {
             <p className="mb-3 text-xs font-bold uppercase text-muted">Admissions</p>
             <div className="grid grid-cols-2 gap-2">
               <a href={telHref(site.admissionsPhone)} className="button-outline"><Phone size={16} /> Call</a>
-              <a href={whatsappHref(site.whatsapp, "Hello, I would like admission guidance from Sir Saqib Tuitions.")} target="_blank" rel="noreferrer" className="button-ink"><MessageCircle size={16} /> WhatsApp</a>
+              <WhatsAppChooserButton className="button-ink"><MessageCircle size={16} /> WhatsApp</WhatsAppChooserButton>
             </div>
           </div>
         </div>
@@ -136,7 +143,7 @@ function DirectLink({ href, label, isActive, light }: { href: string; label: str
   return <Link href={href} aria-current={isActive ? "page" : undefined} className={cn("relative px-3 py-2 text-sm font-bold transition-colors after:absolute after:inset-x-3 after:-bottom-1 after:h-px after:origin-left after:bg-gold after:transition-transform", light ? "text-white/78 hover:text-white" : "text-text hover:text-ink", isActive ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100")}>{label}</Link>;
 }
 
-function NavGroup({ label, items, open, active, light, onToggle, onClose }: { label: string; items: typeof academics; open: boolean; active: boolean; light: boolean; onToggle: () => void; onClose: () => void }) {
+function NavGroup({ label, items, open, active, light, onToggle, onClose }: { label: string; items: readonly { label: string; href: string; note: string }[]; open: boolean; active: boolean; light: boolean; onToggle: () => void; onClose: () => void }) {
   return (
     <div className="relative">
       <button type="button" onClick={onToggle} aria-expanded={open} className={cn("relative flex items-center gap-1 px-3 py-2 text-sm font-bold transition-colors after:absolute after:inset-x-3 after:-bottom-1 after:h-px after:bg-gold", light ? "text-white/78 hover:text-white" : "text-text hover:text-ink", active ? "after:scale-x-100" : "after:scale-x-0")}>

@@ -56,7 +56,7 @@ export const admissionsKnowledge = {
   programmes: {
     gradesIVIII: "Available at all campuses",
     gradesIXX: ["Science", "General", "Sindh Board"],
-    gradesXIXII: ["Science", "Commerce", "Computer Science", "Pre-Engineering", "Sindh Board"],
+    gradesXIXII: ["Pre-Medical", "Pre-Engineering", "General Science", "Commerce"],
     huffaz: "Available at all campuses",
     oLevels: "Available at all campuses; Cambridge/CAIE curriculum; all subjects offered",
     online: false,
@@ -134,6 +134,7 @@ export function classifyAdmissionsIntent(input: string, state: LeadUpdate = {}):
   if (/\b(?:fee+s?|fess|charges|price|cost|total|starting total|first month)\b/i.test(text) || /فیس/u.test(text)) return { intent: "fee", confidence: "high" };
   if (/\b(?:enquiry|inquiry|office)\b.{0,25}\b(?:hours?|timings?|tymings?|open|close)\b/i.test(text) || /\b(?:campus timing|opening hours?|kab khulta|kab band)\b/i.test(text)) return { intent: "campus_enquiry_hours", confidence: "high" };
   if (/\b(?:timetable|time table|class schedule|class timings?|class tymings?|batch timings?|group [ab]|batch [ab])\b/i.test(text) || ((/\b(?:timings?|tymings?|schedule|waqt)\b/i.test(text)) && Boolean(inferClassLevel(text) || state.classLevel))) return { intent: "class_schedule", confidence: "high" };
+  if (state.classLevel && /\b(?:boys?|girls?|hill[ -]?park|science|general|commerce|pre[ -]?medical|pre[ -]?engineering|batch [ab]|group [ab]|morning|evening|subah|shaam)\b/i.test(text)) return { intent: "class_schedule", confidence: "medium" };
   if (/\b(?:qualification|qualified|degree|parhai)\b/i.test(text) && /\b(?:teacher|sir|miss|faculty|saqib|babar|armash|shahid|hanzala|ashhad|javeria|hassan|hasan)\b/i.test(text)) return { intent: "teacher_qualification", confidence: "high" };
   if (/\b(?:experience|tajurba|years? teaching|kitne saal)\b/i.test(text) && /\b(?:teacher|sir|miss|faculty|saqib|babar|armash|shahid|hanzala|ashhad|javeria|hassan|hasan)\b/i.test(text)) return { intent: "teacher_experience", confidence: "high" };
   if (/\b(?:faculty|teachers?|instructors?|who teaches|parhata|parhati)\b/i.test(text)) return { intent: "faculty", confidence: "high" };
@@ -161,71 +162,54 @@ function classText(state: LeadUpdate, input: string): string {
 }
 
 function streamText(state: LeadUpdate, input: string): string {
+  if (/\bpre[ -]?medical\b/i.test(input)) return "Pre-Medical";
+  if (/\bgeneral science|computer(?: science)?|computing\b/i.test(input)) return "General Science";
+  if (/\bpre[ -]?engineering\b/i.test(input)) return "Pre-Engineering";
   if (/\bscience\b/i.test(input)) return "Science";
   if (/\bgeneral\b/i.test(input)) return "General";
   if (/\bcommerce\b/i.test(input)) return "Commerce";
   return state.stream ?? "";
 }
 
-function selectedCampus(state: LeadUpdate, input: string): "boys" | "girls" | "hill-park" | "" {
-  if (/\b(?:girls?|female|beti|larki)\b/i.test(input)) return "girls";
-  if (/\b(?:boys?|male|beta|larka)\b/i.test(input)) return "boys";
-  if (/\bhill[ -]?park\b/i.test(input)) return "hill-park";
-  if (state.preferredCampus === "Boys Campus") return "boys";
-  if (state.preferredCampus === "Girls Campus") return "girls";
-  if (state.preferredCampus === "Hill Park Campus") return "hill-park";
-  if (state.studentGender === "Boy") return "boys";
-  if (state.studentGender === "Girl") return "girls";
-  return "";
-}
-
 function timetableKnowledge(input: string, state: LeadUpdate): Pick<RelevantKnowledge, "facts" | "missingClarification" | "recommendedAction"> {
-  const campus = selectedCampus(state, input);
   const classLevel = classText(state, input).replace(/^Grade /, "");
   const romanToNumber: Record<string, string> = { IX: "9", X: "10", XI: "11", XII: "12" };
   const classNumber = romanToNumber[classLevel] ?? "";
   const stream = streamText(state, input);
+  const campusKnown = Boolean(state.preferredCampus) || /\b(?:boys?|girls?|hill[ -]?park)\b/i.test(input);
   const group = input.match(/\b(?:group|batch)\s*['\"]?([ab])\b/i)?.[1]?.toUpperCase() ?? "";
   const wantsMorning = /\b(?:morning|subah)\b/i.test(input);
   const wantsEvening = /\b(?:evening|shaam)\b/i.test(input);
   const missing: string[] = [];
   if (!classNumber) missing.push("class (IX, X, XI or XII)");
-  if (!campus) missing.push("Boys or Girls Campus");
-  if (!stream) missing.push("stream/group");
-  if (campus === "hill-park") {
-    return {
-      facts: ["The verified website timetable index contains Boys and Girls Campus posters only; no Hill Park schedule may be invented."],
-      missingClarification: [],
-      recommendedAction: { type: "whatsapp", label: "Confirm Hill Park timetable", value: site.whatsapp },
-    };
-  }
+  if (classNumber && !campusKnown && !stream && !group && !wantsMorning && !wantsEvening) missing.push("campus/gender (Boys or Girls)");
+  if (!stream) missing.push("programme (General, Science or Commerce)");
 
   let candidates = timetables.filter((item) =>
-    (!campus || item.campus === campus) &&
     (!classNumber || item.classLevel === classNumber) &&
     (!stream || item.stream.toLowerCase() === stream.toLowerCase()),
   );
-  if (group) candidates = candidates.filter((item) => new RegExp(`(?:group|batch)\\s*${group}\\b`, "i").test(item.variant));
+  if (group) candidates = candidates.filter((item) => item.variant.toLowerCase() === `group ${group.toLowerCase()}`);
   if (wantsMorning) candidates = candidates.filter((item) => /morning/i.test(item.variant));
-  if (wantsEvening) candidates = candidates.filter((item) => /evening|batch [ab]/i.test(item.variant));
+  if (wantsEvening) candidates = candidates.filter((item) => /evening/i.test(item.variant));
 
   if (!missing.length && candidates.length > 1 && !group && !wantsMorning && !wantsEvening) {
     missing.push(`batch/timing (${candidates.map((item) => item.variant).join(" or ")})`);
   }
   if (!missing.length && candidates.length === 0) {
     return {
-      facts: ["No verified timetable poster matches all supplied filters. Do not invent a schedule; offer the timetable finder or campus confirmation."],
+      facts: ["No verified current timetable slot matches all supplied filters. Do not invent a schedule; offer campus confirmation."],
       missingClarification: [],
       recommendedAction: route("Open timetable finder", academyRoutes.timetables),
     };
   }
   if (missing.length) {
-    const known = [campus ? `${campus} campus` : "", classNumber ? `Class ${classNumber}` : "", stream].filter(Boolean).join(", ");
+    const known = [classNumber ? `Class ${classNumber}` : "", state.preferredCampus, stream].filter(Boolean).join(", ");
     const matchingOptions = candidates.length ? [...new Set(candidates.map((item) => item.variant))].join(", ") : "";
     return {
       facts: [
         known ? `Known timetable filters: ${known}.` : "The visitor is asking for a class timetable, not campus enquiry hours.",
-        matchingOptions ? `Verified matching poster variants: ${matchingOptions}.` : "Published timetable posters are filtered by campus, class, stream and batch.",
+        matchingOptions ? `Matching official timetable variants: ${matchingOptions}.` : "Official timetable posters are filtered by class, programme and available variant.",
       ],
       missingClarification: missing,
       recommendedAction: route("View timetables", academyRoutes.timetables),
@@ -233,16 +217,16 @@ function timetableKnowledge(input: string, state: LeadUpdate): Pick<RelevantKnow
   }
 
   const selected = candidates[0];
-  const query = new URLSearchParams({ campus: selected.campus, class: selected.classLevel, stream: selected.stream.toLowerCase(), batch: selected.id });
+  const query = new URLSearchParams({ class: selected.classLevel, stream: selected.stream.toLowerCase(), batch: selected.id });
   const schedule = timetableSchedules[selected.id];
-  const facts = [`Exact verified poster: ${selected.campus === "boys" ? "Boys" : "Girls"} Campus, Class ${selected.classLevel}, ${selected.stream}, ${selected.variant}.`];
+  const facts = [`Official timetable poster: Grade ${selected.grade}, ${selected.stream}, ${selected.variant}.`];
   if (schedule) {
     facts.push(...schedule.map((day) => {
       const slots = day.slots.map((slot) => `${slot.start}-${slot.end} ${slot.subject}`).join("; ");
       return `${day.day}: ${slots || day.note}${slots && day.note ? `; ${day.note}` : ""}.`;
     }));
   } else {
-    facts.push("The exact poster is verified, but its day/subject text has not been safely transcribed. Do not guess it; use the filtered timetable action.");
+    facts.push("Updated structured timetable text has not been installed. Do not quote old timing information or infer timings from images.");
   }
   return {
     facts,
@@ -328,8 +312,8 @@ export function selectRelevantKnowledge(input: string, state: LeadUpdate = {}): 
       else if (/\b(?:huffaz|hafiz)\b/i.test(combinedClass)) base.facts.push("The Huffaz Programme is available at all campuses.");
       else if (grade && grade <= 8) base.facts.push(`Grade ${grade} foundation tuition is available at all campuses.`);
       else if (grade && grade <= 10) base.facts.push(`Grade ${grade} offers Science, General and Sindh Board.`);
-      else if (grade) base.facts.push(`Grade ${grade} offers Science, Commerce, Computer Science, Pre-Engineering and Sindh Board.`);
-      else base.facts.push("Programmes: Grades I-VIII foundation and Huffaz at all campuses; Grades IX-X Science, General and Sindh Board; Grades XI-XII Science, Commerce, Computer Science, Pre-Engineering and Sindh Board; O Levels Cambridge/CAIE at all campuses.");
+      else if (grade) base.facts.push(`Grade ${grade} offers XI-XII Pre-Medical, Pre-Engineering, General Science and Commerce pathways.`);
+      else base.facts.push("Programmes: Grades I-VIII foundation and Huffaz at all campuses; Grades IX-X Science and General; Grades XI-XII Pre-Medical, Pre-Engineering, General Science and Commerce.");
       base.recommendedAction = route("Explore programmes", academyRoutes.courses);
       return base;
     }
@@ -341,8 +325,8 @@ export function selectRelevantKnowledge(input: string, state: LeadUpdate = {}): 
     case "curriculum_board":
       if (/\b(?:o[ -]?levels?|caie|cambridge)\b/i.test(combinedClass)) base.facts.push("O Levels follows Cambridge/CAIE and all subjects are offered.");
       else if ([9, 10].includes(gradeNumber(combinedClass) ?? 0)) base.facts.push("Grades IX-X offer Science, General and Sindh Board; this is not the Cambridge/CAIE O Levels programme.");
-      else if ([11, 12].includes(gradeNumber(combinedClass) ?? 0)) base.facts.push("Grades XI-XII offer Science, Commerce, Computer Science, Pre-Engineering and Sindh Board.");
-      else base.facts.push("Grades IX-X offer Science, General and Sindh Board; Grades XI-XII offer Science, Commerce, Computer Science, Pre-Engineering and Sindh Board. O Levels separately follows Cambridge/CAIE.");
+      else if ([11, 12].includes(gradeNumber(combinedClass) ?? 0)) base.facts.push("Grades XI-XII offer Pre-Medical, Pre-Engineering, General Science and Commerce.");
+      else base.facts.push("Grades IX-X offer Science and General; Grades XI-XII offer Pre-Medical, Pre-Engineering, General Science and Commerce. O Levels separately follows Cambridge/CAIE.");
       return base;
     case "faculty":
     case "teacher_qualification":

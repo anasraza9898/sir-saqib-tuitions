@@ -37,15 +37,34 @@ npm run assets    # Copy the controlled optimized asset manifest
 - Interactive result, timetable, media and contact experiences render only the active media state.
 - Native metadata, sitemap, robots, organization/location JSON-LD, FAQ JSON-LD and breadcrumb JSON-LD cover search requirements.
 
-## Asset Workflow
+## Final Asset Workflow
 
-`scripts/copy-assets.mjs` uses a fixed source-to-destination map. It reads only from `../02-website-assets`, copies 44 website-ready files into `public/assets`, rejects destination collisions and never writes to `01-original-assets` or `02-website-assets`.
+Final HD videos are loaded from stable slots under `public/assets/final/videos`.
+Add the approved files with these exact names, commit and redeploy. No code
+change is required:
 
-The hero source is the real speaking introduction video:
+- `academy-introduction.mp4`
+- `girls-campus.mp4`
+- `boys-campus.mp4`
+- `classroom-learning.mp4`
+- `results.mp4`
+- `testimonials.mp4`
 
-`public/assets/videos/hero/sir-saqib-introduction.mp4`
+Final timetable posters are copied from `../02-website-assets/images/timetables`
+through `npm run assets` and loaded from stable slots under
+`public/assets/timetables/official`. Use the slot names referenced by
+`src/data/site.ts`, for example:
 
-Six lightweight WebP video posters in `public/assets/posters/video` were captured from the real optimized academy videos. `public/assets/paper-noise.png` is a tiny local texture. These derived files are already part of the public build and do not use stock imagery.
+- `grade-ix-general-group-a.png`
+- `grade-ix-general-morning.png`
+- `grade-x-science-group-b.png`
+- `grade-xi-commerce-evening.png`
+- `grade-xii-science-main.png`
+
+The website must expose only the approved official timetable image entries in
+`src/data/site.ts`. AI timetable answers only use verified structured data from
+`timetableSchedules`; adding an image alone does not make the AI quote timetable
+text.
 
 ## Deployment
 
@@ -58,13 +77,13 @@ The project is compatible with Vercel's standard Next.js flow:
 
 ## Future AI and Leads
 
-The current admission assistant is deterministic and reads verified local content only. It does not call Gemini, persist leads or display a fake saved state.
-
-A later phase should add a server-only adapter behind a Route Handler or Server Action. It should validate and rate-limit requests, keep Gemini and Google credentials in server-only variables, ground answers in the existing content model, obtain consent before capture, confirm persistence before showing success, and update the privacy notice.
+The admission assistant uses server-side Gemini when configured and falls back to
+verified local guidance when the provider is unavailable. Lead capture is handled
+through `/api/leads` with validation, consent and duplicate protection.
 
 ## Content Guardrails
 
-- Keep the published ranges at Grades I-VIII and Grades IX-XII.
+- Keep the published ranges at Grades I-VIII, Matric, Intermediate and Huffaz.
 - Do not add O Levels until the client confirms the programme.
 - Do not add ratings, student totals, awards, affiliations or performance percentages without approval.
 - Direct fees, exact timings, registration documents and trial-class questions to admissions.

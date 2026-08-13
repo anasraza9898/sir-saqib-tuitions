@@ -16,10 +16,10 @@ const dmSerif = DM_Serif_Display({ subsets: ["latin"], weight: "400", variable: 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: {
-    default: "Sir Saqib Tuitions Karachi | Grades IX-XII, Science, General & Commerce",
+    default: "Sir Saqib Tuitions Karachi | Matric, Intermediate, Grades I-VIII & Huffaz",
     template: "%s | Sir Saqib Tuitions",
   },
-  description: "Explore courses, campuses, faculty, results and timetables at Sir Saqib Tuitions in Karachi for Grades IX-XII, Science, General, Commerce and Huffaz programmes.",
+  description: "Explore programmes, campuses, faculty, results and timetable slots at Sir Saqib Tuitions in Karachi for Grades I-VIII, Matric, Intermediate and Huffaz support.",
   applicationName: site.name,
   authors: [{ name: site.name }],
   creator: site.name,
@@ -27,12 +27,12 @@ export const metadata: Metadata = {
   category: "education",
   alternates: { canonical: "/" },
   icons: {
-    icon: [{ url: "/assets/logo/sir-saqib-tuitions-logo.webp", type: "image/webp" }],
-    apple: [{ url: "/assets/logo/sir-saqib-tuitions-logo.webp", type: "image/webp" }],
+    icon: [{ url: "/assets/logo/SST_Logo_T.b.png", type: "image/png" }],
+    apple: [{ url: "/assets/logo/SST_Logo_T.b.png", type: "image/png" }],
   },
   openGraph: {
     title: "Sir Saqib Tuitions Karachi",
-    description: "Focused learning for Grades IX-XII, foundation tuition for Grades I-VIII and formal education support for Huffaz across three Karachi campuses.",
+    description: "Focused learning for Grades I-VIII, Matric, Intermediate and formal education support for Huffaz across three Karachi campuses.",
     type: "website",
     locale: "en_PK",
     url: "/",
@@ -65,7 +65,7 @@ const organizationJsonLd = {
       slogan: site.tagline,
       description: site.description,
       url: siteUrl.href,
-      logo: new URL("/assets/logo/sir-saqib-tuitions-logo.webp", siteUrl).href,
+      logo: new URL("/assets/logo/SST_Logo_T.b.png", siteUrl).href,
       telephone: site.admissionsPhone,
       areaServed: "Karachi, Pakistan",
     },

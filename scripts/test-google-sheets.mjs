@@ -126,7 +126,7 @@ else {
             if (!tabs.includes(TAB_NAME)) fail("LEADS_TAB_NOT_FOUND", undefined, phase);
             else {
               phase = "append";
-              const marker = "TEST LEAD  DELETE ME";
+              const marker = "TEST LEAD — DELETE ME";
               const row = [new Date().toISOString(), marker, "", "", "", "", "", "", "", "", "", "", "/scripts/test-google-sheets.mjs", "Yes", "TEST"];
               const endpoint = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sheetId)}/values/${encodeURIComponent(APPEND_RANGE)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
               const appendResponse = await fetchTimed(endpoint, {

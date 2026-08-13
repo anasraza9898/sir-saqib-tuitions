@@ -11,10 +11,10 @@ export function SiteFooter() {
         <div className="grid gap-10 lg:grid-cols-[1.15fr_0.7fr_0.9fr_1.35fr]">
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
-              <Image src="/assets/logo/sir-saqib-tuitions-logo.webp" alt="" width={58} height={58} className="h-14 w-14 rounded-sm object-cover ring-1 ring-white/15" />
+              <Image src="/assets/logo/SST_Logo_T.b.png" alt="Sir Saqib Tuitions official logo" width={58} height={58} className="h-14 w-14 object-contain" />
               <span><span className="block font-display text-2xl">{site.name}</span><span className="mt-1 block text-[10px] font-bold uppercase text-gold-light">{site.tagline}</span></span>
             </Link>
-            <p className="mt-6 max-w-sm text-sm leading-7 text-white/62">Focused tuition for Grades I-VIII and IX-XII, with Science, General, Commerce, Computer Science, Pre-Engineering and formal education support for Huffaz.</p>
+            <p className="mt-6 max-w-sm text-sm leading-7 text-white/62">Focused tuition for Grades I-VIII, Matric and Intermediate, with formal education support for Huffaz.</p>
             <Link href="/contact#enquiry" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-gold-light hover:text-white">Get admission guidance <ArrowUpRight size={15} /></Link>
           </div>
           <div>

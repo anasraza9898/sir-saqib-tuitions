@@ -20,11 +20,11 @@ export const LEAD_CLASS_LEVELS = [
 ] as const;
 
 export const LEAD_STREAMS = [
-  "Foundation",
   "Science",
   "General",
   "Commerce",
-  "Computer Science",
+  "Pre-Medical",
+  "General Science",
   "Pre-Engineering",
   "Sindh Board",
   "Cambridge/CAIE",

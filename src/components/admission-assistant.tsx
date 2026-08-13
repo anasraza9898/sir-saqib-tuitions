@@ -27,6 +27,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { AdmissionLeadForm } from "@/components/admission-lead-form";
 import { Modal } from "@/components/modal";
+import { WhatsAppChooserButton } from "@/components/whatsapp-campus-chooser";
 import { site } from "@/data/site";
 import {
   CHAT_MAX_TURNS,
@@ -40,7 +41,7 @@ import {
   type RecommendedAction,
 } from "@/lib/ai/contracts";
 import { buildWhatsAppLeadMessage, mergeLeadDraft, type LeadDraft } from "@/lib/ai/lead";
-import { telHref, whatsappHref } from "@/lib/utils";
+import { telHref } from "@/lib/utils";
 
 type UiMessage = ChatMessage & { id: string };
 
@@ -103,8 +104,8 @@ export function AdmissionAssistant({ open, onClose }: { open: boolean; onClose: 
   const requestRef = useRef<AbortController | null>(null);
 
   const roman = language === "roman-ur";
-  const whatsapp = useMemo(
-    () => whatsappHref(site.whatsapp, buildWhatsAppLeadMessage(language ?? "en", leadDraft)),
+  const whatsappMessage = useMemo(
+    () => buildWhatsAppLeadMessage(language ?? "en", leadDraft),
     [language, leadDraft],
   );
 
@@ -276,7 +277,7 @@ export function AdmissionAssistant({ open, onClose }: { open: boolean; onClose: 
       return <Link href={action.value} onClick={close} className={classes}>{action.label}</Link>;
     }
     if (action.type === "call") return <a href={telHref(action.value || site.admissionsPhone)} className={classes}><Phone size={13} />{action.label}</a>;
-    if (action.type === "whatsapp") return <a href={whatsapp} target="_blank" rel="noreferrer" className={classes}><MessageCircle size={13} />{action.label}</a>;
+    if (action.type === "whatsapp") return <WhatsAppChooserButton message={whatsappMessage} className={classes}><MessageCircle size={13} />{action.label}</WhatsAppChooserButton>;
     if (action.type === "lead_form") return <button type="button" onClick={() => setShowLeadForm(true)} className={classes}><UserRoundPlus size={13} />{action.label}</button>;
     return null;
   }
@@ -285,10 +286,9 @@ export function AdmissionAssistant({ open, onClose }: { open: boolean; onClose: 
     <Modal open={open} onClose={close} labelledBy="assistant-title" className="h-[100dvh] overflow-hidden rounded-t-2xl sm:h-[min(760px,90dvh)] sm:max-w-3xl sm:rounded-sm">
       <div className="flex h-full min-h-0 flex-col bg-paper">
         <header className="relative shrink-0 overflow-hidden bg-ink px-4 py-3.5 text-white sm:px-6 sm:py-4">
-          <span className="absolute right-24 top-0 h-full w-px bg-gold/20" aria-hidden="true" />
           <div className="relative flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
-              <Image src="/assets/logo/sir-saqib-tuitions-logo.webp" alt="" width={44} height={44} className="h-10 w-10 shrink-0 rounded-sm object-cover ring-1 ring-gold/35 sm:h-11 sm:w-11" />
+              <Image src="/assets/logo/SST_Logo_T.b.png" alt="Sir Saqib Tuitions official logo" width={44} height={44} className="h-10 w-10 shrink-0 object-contain sm:h-11 sm:w-11" />
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-[10px] font-bold uppercase tracking-wide text-gold-light">AI admissions consultant</p>
@@ -386,7 +386,7 @@ export function AdmissionAssistant({ open, onClose }: { open: boolean; onClose: 
                     <p className="max-w-sm text-[10px] leading-4 text-muted">{roman ? "Chat mein likhi details submit nahin hotin. Contact form aur consent ke baad hi enquiry save hoti hai." : "Details typed in chat are not submitted. An enquiry is saved only through the contact form with consent."}</p>
                     <div className="flex gap-3">
                       <a href={telHref(site.admissionsPhone)} className="inline-flex items-center gap-1 text-[11px] font-bold text-ink hover:text-girls"><Phone size={13} /> {roman ? "Call" : "Call"}</a>
-                      <a href={whatsapp} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px] font-bold text-[#176b50]"><MessageCircle size={13} /> WhatsApp</a>
+                      <WhatsAppChooserButton message={whatsappMessage} className="inline-flex items-center gap-1 text-[11px] font-bold text-[#176b50]"><MessageCircle size={13} /> WhatsApp</WhatsAppChooserButton>
                     </div>
                   </div>
                 </div>

@@ -5,8 +5,8 @@ import { Pause, Play } from "lucide-react";
 
 const announcements = [
   "Admissions Open",
-  "Grades IX-XII",
-  "Science / General / Commerce",
+  "Matric and Intermediate",
+  "Pre-Medical / Pre-Engineering / General Science / Commerce",
   "Boys / Girls / Hill Park Campuses",
   "Grades I-VIII Foundation Tuition",
   "Huffaz Formal Education Programme",
