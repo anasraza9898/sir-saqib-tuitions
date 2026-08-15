@@ -121,7 +121,16 @@ test("keeps final timetable slots but does not quote retired schedule text", () 
   assert.doesNotMatch(context.facts.join("\n"), /Monday: 4:30 PM/i);
   assert.match(context.recommendedAction.value, /batch=ix-science-group-a/);
   assert.equal(timetableSchedules["ix-science-group-a"], undefined);
-  assert.equal(timetables.length, 14);
+  assert.equal(timetables.length, 15);
+});
+
+test("exposes Grade IX Science Group B without structured timing text", () => {
+  const context = selectRelevantKnowledge("Class 9 Science Group B ki timing?", {});
+  assert.equal(context.missingClarification.length, 0);
+  assert.match(context.facts.join("\n"), /Official timetable poster: Grade IX, Science, Group B/i);
+  assert.match(context.facts.join("\n"), /Updated structured timetable text has not been installed/i);
+  assert.match(context.recommendedAction.value, /batch=ix-science-group-b/);
+  assert.equal(timetableSchedules["ix-science-group-b"], undefined);
 });
 
 test("retains timetable intent and does not repeat answered clarification", () => {
@@ -135,8 +144,9 @@ test("retains timetable intent and does not repeat answered clarification", () =
   assert.equal(state.classLevel, "Grade IX");
   assert.equal(state.stream, "Science");
   assert.equal(context.intent, "class_schedule");
-  assert.deepEqual(context.missingClarification, []);
-  assert.match(context.recommendedAction.value, /batch=ix-science-group-a/);
+  assert.deepEqual(context.missingClarification, ["batch/timing (Group A or Group B)"]);
+  assert.match(context.facts.join("\n"), /Matching official timetable variants: Group A, Group B/i);
+  assert.equal(context.recommendedAction.value, "/timetables");
 });
 
 test("later corrections replace earlier conversation state", () => {

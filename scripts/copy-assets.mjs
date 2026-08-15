@@ -26,6 +26,7 @@ const assetMap = {
   "images/timetables/9 general group  b batch.png": "timetables/official/grade-ix-general-group-b.png",
   "images/timetables/9 general morning batch.png": "timetables/official/grade-ix-general-morning.png",
   "images/timetables/9 science group a batch.png": "timetables/official/grade-ix-science-group-a.png",
+  "images/timetables/9 science group b batch.png": "timetables/official/grade-ix-science-group-b.png",
   "images/timetables/10 general morning batch.png": "timetables/official/grade-x-general-morning.png",
   "images/timetables/10 general evening batch.png": "timetables/official/grade-x-general-evening.png",
   "images/timetables/10 science group a batch.png": "timetables/official/grade-x-science-group-a.png",
