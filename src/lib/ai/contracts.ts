@@ -109,7 +109,7 @@ export const recommendedActionSchema = z
   })
   .strict();
 
-/** Gemini may omit every metadata field that is not useful for this turn. */
+/** AI providers may omit every metadata field that is not useful for this turn. */
 export const assistantStructuredResponseSchema = z
   .object({
     message: z.string().trim().min(1).max(1_200),
@@ -138,14 +138,14 @@ export type AssistantStructuredResponse = {
   recommendedAction: RecommendedAction;
 };
 
-export type AssistantMode = "gemini" | "demo";
+export type AssistantMode = "ai" | "demo" | "gemini";
 
 export type ChatSuccessResponse = {
   ok: true;
   data: AssistantStructuredResponse & {
     mode: AssistantMode;
     model?: string;
-    provider?: "interactions" | "generateContent";
+    provider?: "groq" | "interactions" | "generateContent";
   };
 };
 

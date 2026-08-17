@@ -12,6 +12,7 @@
     "lint:fix": "eslint . --fix",
     "test": "npm run test:ai",
     "test:ai": "node --experimental-strip-types --test tests/ai.test.ts",
+    "test:groq": "node scripts/test-groq.mjs",
     "test:gemini": "node scripts/test-gemini.mjs",
     "test:sheets": "node scripts/test-google-sheets.mjs"
   },

@@ -75,16 +75,18 @@ The project is compatible with Vercel's standard Next.js flow:
 3. Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS origin. Vercel's production URL is used as a fallback when available.
 4. Do not expose server credentials through `NEXT_PUBLIC_*` variables.
 
-## Future AI and Leads
+## AI and Leads
 
-The admission assistant uses server-side Gemini when configured and falls back to
-verified local guidance when the provider is unavailable. Lead capture is handled
-through `/api/leads` with validation, consent and duplicate protection.
+The admission assistant uses server-side Groq AI Guidance when configured and
+falls back to verified Backup Guidance when the provider is unavailable. Gemini
+code remains in the repository as an optional legacy provider only. Lead capture
+is handled through `/api/leads` with validation, consent and duplicate
+protection.
 
 ## Content Guardrails
 
 - Keep the published ranges at Grades I-VIII, Matric, Intermediate and Huffaz.
-- Do not add O Levels until the client confirms the programme.
+- Keep O Levels limited to the verified academy facts in `src/lib/ai/knowledge.ts` and `src/data/site.ts`.
 - Do not add ratings, student totals, awards, affiliations or performance percentages without approval.
 - Direct fees, exact timings, registration documents and trial-class questions to admissions.
 - Keep 2026 results separate from the previous 2025 collection.

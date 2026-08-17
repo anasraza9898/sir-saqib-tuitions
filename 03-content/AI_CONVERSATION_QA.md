@@ -8,7 +8,7 @@ Deployment: not performed
 
 The unacceptable replies came from the assistant orchestration treating deterministic keyword/fact lookup as a reply brain. The broad local knowledge path selected large blocks such as all programmes, all fees, or generic campus/timetable guidance, then those blocks were used as final answers or as schema fallbacks. That made greetings, names, fee questions and timing questions behave like keyword matches instead of context-aware admissions conversation.
 
-The redesigned path keeps deterministic logic for validation, state extraction, security blocks, fact selection, exact fee calculation, action validation and provider-failure fallback. Gemini receives compact conversation state plus only the relevant verified facts for the latest turn, and Gemini composes the normal visible reply.
+The redesigned path keeps deterministic logic for validation, state extraction, security blocks, fact selection, exact fee calculation, action validation and provider-failure fallback. Groq receives compact conversation state plus only the relevant verified facts for the latest turn, and composes the normal visible reply. Gemini remains optional legacy provider code only.
 
 ## Current Pipeline
 
@@ -16,10 +16,10 @@ The redesigned path keeps deterministic logic for validation, state extraction, 
 2. Route validates shape, rate limits and body size.
 3. Explicit visitor state is extracted: name, role, class, stream, gender/campus, timing preference and question.
 4. Intent classification selects relevant facts only; it does not produce the ordinary final reply.
-5. Gemini receives principle-based admissions instructions, compact state and the selected fact context.
+5. Groq receives principle-based admissions instructions, compact state and the selected fact context.
 6. Structured output is optional except for `message`; Zod validates metadata and safe actions.
 7. If structured parsing fails, recover the textual model answer when possible.
-8. Deterministic text is used only for prompt/safety blocks, missing Gemini configuration, quota/provider failure, or infrastructure failure.
+8. Deterministic text is used only for prompt/safety blocks, missing Groq configuration, rate-limit/provider failure, or infrastructure failure.
 
 ## Timetable Handling
 
@@ -43,7 +43,7 @@ Results route to verified 2026 or 2025 result poster categories without inventin
 Command: `node scripts/test-conversation-api.mjs`  
 Result: `34/34` passed.
 
-The first live requests reached Gemini successfully. During the burst test, Gemini returned sanitized `429 QUOTA_EXCEEDED` diagnostics, so later cases used the local emergency fallback. The fallback now preserves direct facts and safe actions instead of broad canned blocks.
+The current production provider order is Groq first, then verified Backup Guidance. The route does not automatically call Gemini after Groq failure. The fallback preserves direct facts and safe actions instead of broad canned blocks.
 
 Covered cases:
 
@@ -108,7 +108,8 @@ The current local root cause for "leads not appearing" is not a Sheets adapter f
 ## Command Results
 
 - `npm test`: 26/26 pass.
-- `npm run test:gemini`: Interactions OK; `generateContent` OK for `gemini-3.6-flash`.
+- `npm run test:groq`: Production-provider smoke test.
+- `npm run test:gemini`: Optional legacy-provider smoke test only; not required for production readiness.
 - `npm run test:sheets`: OK; appended test row to `Leads!A:O`.
 - `npm run lint`: pass.
 - `npm run build`: pass; 16 static pages generated, both API routes dynamic.

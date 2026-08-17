@@ -292,8 +292,8 @@ export function AdmissionAssistant({ open, onClose }: { open: boolean; onClose: 
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-[10px] font-bold uppercase tracking-wide text-gold-light">AI admissions consultant</p>
-                  {mode === "demo" ? <span className="inline-flex items-center gap-1 rounded-full border border-white/20 px-2 py-0.5 text-[9px] font-bold uppercase text-white/75"><WifiOff size={10} /> Local guidance</span> : null}
-                  {mode === "gemini" ? <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 px-2 py-0.5 text-[9px] font-bold uppercase text-emerald-200"><Wifi size={10} /> Gemini connected</span> : null}
+                  {mode === "demo" ? <span className="inline-flex items-center gap-1 rounded-full border border-white/20 px-2 py-0.5 text-[9px] font-bold uppercase text-white/75"><WifiOff size={10} /> Backup Guidance</span> : null}
+                  {mode === "ai" || mode === "gemini" ? <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 px-2 py-0.5 text-[9px] font-bold uppercase text-emerald-200"><Wifi size={10} /> AI Guidance</span> : null}
                 </div>
                 <h2 id="assistant-title" className="mt-1 truncate font-display text-lg sm:text-2xl">Sir Saqib Admissions</h2>
               </div>

@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { chatRequestSchema, type ApiErrorResponse, type ChatSuccessResponse } from "@/lib/ai/contracts";
 import { getLocalAssistantResponse } from "@/lib/ai/fallback";
 import {
-  generateGeminiReply,
-  getConfiguredModelForDiagnostics,
-  hasGeminiApiKey,
-  logGeminiDevelopmentDiagnostic,
-} from "@/lib/ai/gemini";
+  classifyGroqProviderError,
+  generateGroqReply,
+  getConfiguredGroqModelForDiagnostics,
+  hasGroqApiKey,
+  logGroqDevelopmentDiagnostic,
+} from "@/lib/ai/groq";
 import { consumeRateLimit, getRequestClientId } from "@/lib/ai/rate-limit";
 import { isAbusiveOrDangerous, isPromptInjectionAttempt } from "@/lib/ai/safety";
 import { extractConversationState } from "@/lib/ai/context";
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
     .map((message) => message.content);
   const conversationState = extractConversationState(parsed.data.messages, parsed.data.leadState);
   const relevantKnowledge = selectRelevantKnowledge(latest, conversationState);
-  const keyAvailable = hasGeminiApiKey();
+  const keyAvailable = hasGroqApiKey();
   const deterministic = getLocalAssistantResponse(latest, history, parsed.data.language, conversationState);
 
   if (isPromptInjectionAttempt(latest) || isAbusiveOrDangerous(latest)) {
@@ -85,7 +86,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await generateGeminiReply(parsed.data.messages, parsed.data.language, deterministic, {
+    const result = await generateGroqReply(parsed.data.messages, parsed.data.language, deterministic, {
       conversationState,
       relevantKnowledge,
     });
@@ -93,21 +94,25 @@ export async function POST(request: Request) {
       ok: true,
       data: {
         ...result.response,
-        mode: "gemini",
-        model: result.model,
-        provider: result.method,
+        mode: "ai",
+      },
+    }, process.env.NODE_ENV === "production" ? undefined : {
+      headers: {
+        "X-AI-Provider": "groq",
+        "X-AI-Model": result.model,
+        "X-AI-Structured": String(result.structured),
       },
     });
   } catch (error) {
     const context = {
-      model: getConfiguredModelForDiagnostics(),
-      method: "interactions" as const,
+      model: getConfiguredGroqModelForDiagnostics(),
       hasApiKey: keyAvailable,
     };
-    logGeminiDevelopmentDiagnostic(error, context);
+    const classified = classifyGroqProviderError(error, context);
+    logGroqDevelopmentDiagnostic(error, context, classified.code);
     return NextResponse.json<ChatSuccessResponse>(
       { ok: true, data: { ...deterministic, mode: "demo" } },
-      { headers: { "X-AI-Fallback": "local-guidance" } },
+      { headers: { "X-AI-Fallback": "backup-guidance", "X-AI-Fallback-Reason": classified.code } },
     );
   }
 }

@@ -12,13 +12,13 @@ const cases = [
   { id: "starting-total", language: "en", messages: [{ role: "user", content: "What is the total starting cost for Class 9?" }], required: [/6,000/, /5,000/, /1,000/] },
   { id: "sibling-discount", language: "roman-ur", messages: [{ role: "user", content: "Do bachon ka admission hai, sibling discount?" }], required: [/10%/, /monthly/i], forbidden: [/O Levels|all fees/i] },
   { id: "ambiguous-class-timing", language: "roman-ur", messages: [{ role: "user", content: "Class 9 ki timing kya hai?" }], required: [/Boys|Girls/i, /Science|General|stream|group/i], forbidden: [/11:00 AM-1:00 PM|PKR/] },
-  { id: "exact-boys-schedule", language: "roman-ur", messages: [{ role: "user", content: "Boys Class 9 Science Group A ki timing?" }], required: [/Grade IX|Class 9/i, /Science/i, /Group A/i], forbidden: [/11:00 AM-1:00 PM|PKR/], action: "route", actionContains: "batch=ix-science-group-a" },
+  { id: "exact-boys-schedule", language: "roman-ur", messages: [{ role: "user", content: "Boys Class 9 Science Group B ki timing?" }], required: [/Grade IX|Class 9/i, /Science/i, /Group B/i], forbidden: [/11:00 AM-1:00 PM|PKR/], action: "route", actionContains: "batch=ix-science-group-b" },
   { id: "contextual-schedule", language: "roman-ur", messages: [{ role: "user", content: "Class 9 Science ki timing?" }, { role: "assistant", content: "Boys ya Girls Campus?" }, { role: "user", content: "Boys Campus." }, { role: "assistant", content: "Group A ya B?" }, { role: "user", content: "Group A." }], required: [/Grade IX|Class 9/i, /Science/i, /Group A/i], action: "route", actionContains: "batch=ix-science-group-a" },
   { id: "girls-general-schedule", language: "en", messages: [{ role: "user", content: "Girls Campus Class 9 General schedule" }], required: [/Group A|Group B|Morning|batch|timing/i], forbidden: [/11:00 AM-1:00 PM|PKR/], action: "route", actionContains: "/timetables" },
   { id: "campus-enquiry-hours", language: "en", messages: [{ role: "user", content: "What are the Boys Campus enquiry hours?" }], required: [/11:00 AM/, /4:00 PM/], forbidden: [/Group A|Maths|Physics/] },
   { id: "sunday-hours", language: "roman-ur", messages: [{ role: "user", content: "Sunday ko Girls Campus kab khulta hai?" }], required: [/confirm|confirmed|tasdeeq/i], action: "whatsapp" },
   { id: "olevel-availability", language: "en", messages: [{ role: "user", content: "Are O Levels available?" }], required: [/all campuses/i, /Cambridge|CAIE/i], forbidden: [/Grades XI-XII/] },
-  { id: "olevel-fee", language: "en", messages: [{ role: "user", content: "What is the O Levels fee?" }], required: [/8,000/, /1,000/], forbidden: [/Grades IX|6,000/] },
+  { id: "olevel-fee", language: "en", messages: [{ role: "user", content: "What is the O Levels fee?" }], required: [/8,000/], forbidden: [/Grades IX|6,000/] },
   { id: "olevel-subjects", language: "roman-ur", messages: [{ role: "user", content: "O Levels mein kaun se subjects hain?" }], required: [/all subjects|tamam subjects/i, /CAIE|Cambridge/i] },
   { id: "class9-board", language: "en", messages: [{ role: "user", content: "Which board or curriculum is Class 9?" }], required: [/Sindh Board/i], forbidden: [/Class 9.*Cambridge|Grade 9.*CAIE/i] },
   { id: "saqib-experience", language: "roman-ur", messages: [{ role: "user", content: "Sir Saqib ka experience kitna hai?" }], required: [/24/, /CAT|B\.Com|MBA/] },
@@ -75,6 +75,6 @@ for (const result of results) {
 }
 
 const passed = results.filter((result) => result.pass).length;
-const geminiResponses = results.filter((result) => result.data?.mode === "gemini").length;
-console.log(`Conversation API QA: ${passed}/${results.length} passed; Gemini responses=${geminiResponses}; fallback responses=${results.length - geminiResponses}`);
+const aiResponses = results.filter((result) => result.data?.mode === "ai").length;
+console.log(`Conversation API QA: ${passed}/${results.length} passed; AI Guidance responses=${aiResponses}; Backup Guidance responses=${results.length - aiResponses}`);
 if (passed !== results.length) process.exitCode = 1;

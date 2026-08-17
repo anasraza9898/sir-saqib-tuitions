@@ -6,7 +6,7 @@ const injectionPatterns = [
   /\b(system prompt|developer message|hidden instructions?|prompt injection|jailbreak|dan mode)\b/i,
   /<\/?(system|developer|assistant|instructions?)>/i,
   /\bact as\b[\s\S]{0,50}\b(without restrictions|unfiltered|developer|system)\b/i,
-  /\b(api key|gemini_api_key|google_private_key|service account key)\b/i,
+  /\b(api key|groq_api_key|gemini_api_key|google_private_key|service account key)\b/i,
 ];
 
 const abusivePatterns = [

@@ -20,6 +20,13 @@ import {
   parseGeminiStructuredResponse,
   validateGeminiModel,
 } from "../src/lib/ai/gemini.ts";
+import {
+  classifyGroqProviderError,
+  DEFAULT_GROQ_MODEL,
+  getConfiguredGroqModelForDiagnostics,
+  hasGroqApiKey,
+  parseGroqStructuredResponse,
+} from "../src/lib/ai/groq.ts";
 import { claimLeadSubmission } from "../src/lib/leads/duplicate-submission.ts";
 import {
   createLeadAdapter,
@@ -294,4 +301,34 @@ test("normalizes Gemini environment values and classifies provider failures", ()
   assert.throws(() => validateGeminiModel("gemini-3-flash-preview"), { name: "GeminiRequestError" });
   const context = { model: "gemini-3.6-flash", method: "interactions" as const, hasApiKey: true };
   assert.equal(classifyProviderError(Object.assign(new Error("Resource exhausted: quota"), { status: 429 }), context).code, "QUOTA_EXCEEDED");
+});
+
+test("uses Groq as the primary configured AI provider without public keys", () => {
+  const environment = {
+    GROQ_API_KEY: ' "gsk_test_placeholder" ',
+    GROQ_MODEL: "",
+    NEXT_PUBLIC_GROQ_API_KEY: "must-not-be-read",
+  } as NodeJS.ProcessEnv;
+  assert.equal(DEFAULT_GROQ_MODEL, "openai/gpt-oss-20b");
+  assert.equal(getConfiguredGroqModelForDiagnostics(environment), DEFAULT_GROQ_MODEL);
+  assert.equal(hasGroqApiKey(environment), true);
+  assert.equal(hasGroqApiKey({ NEXT_PUBLIC_GROQ_API_KEY: "public-value" } as NodeJS.ProcessEnv), false);
+});
+
+test("validates and recovers Groq structured responses safely", () => {
+  const parsed = parseGroqStructuredResponse(JSON.stringify({ message: "The O Levels monthly fee is PKR 8,000.", language: "en" }), "en", fallbackResponse());
+  assert.equal(parsed.structured, true);
+  assert.equal(parsed.response.message, "The O Levels monthly fee is PKR 8,000.");
+  const malformed = '{"message":"Sibling discount is 10% on monthly fees.","suggestions":not-json}';
+  const recovered = parseGroqStructuredResponse(malformed, "en", fallbackResponse());
+  assert.equal(recovered.structured, false);
+  assert.equal(recovered.recoveredText, true);
+  assert.equal(recovered.response.message, "Sibling discount is 10% on monthly fees.");
+});
+
+test("classifies Groq provider failures with sanitized production codes", () => {
+  const context = { model: DEFAULT_GROQ_MODEL, hasApiKey: true };
+  assert.equal(classifyGroqProviderError(Object.assign(new Error("Invalid API key"), { status: 401 }), context).code, "INVALID_API_KEY");
+  assert.equal(classifyGroqProviderError(Object.assign(new Error("model not found"), { status: 404 }), context).code, "MODEL_NOT_FOUND");
+  assert.equal(classifyGroqProviderError(Object.assign(new Error("rate limit reached"), { status: 429 }), context).code, "RATE_LIMITED");
 });

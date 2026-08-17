@@ -7,7 +7,7 @@ import { createMetadata } from "@/lib/metadata";
 export const metadata: Metadata = createMetadata("Privacy Notice", "How the Sir Saqib Tuitions website handles AI admission chats, follow-up details and external links.", "/privacy");
 
 const notices = [
-  { title: "Admission chat", text: "When Gemini is configured, chat messages are processed securely through the server to provide admission guidance. Without credentials, the assistant stays in local demo mode. Do not share CNIC, passwords, payment cards or sensitive documents.", icon: ShieldCheck },
+  { title: "Admission chat", text: "When AI guidance is configured, chat messages are processed securely through the server to provide admission guidance. Without credentials, the assistant uses backup guidance. Do not share CNIC, passwords, payment cards or sensitive documents.", icon: ShieldCheck },
   { title: "Lead details", text: "The guided form requires consent and validates admission follow-up details. In this phase it does not write leads to Google Sheets or another external database; the result states this plainly.", icon: Database },
   { title: "External services", text: "WhatsApp and Google Maps links open third-party services. Their privacy practices apply after you leave this website.", icon: ExternalLink },
 ] as const;
