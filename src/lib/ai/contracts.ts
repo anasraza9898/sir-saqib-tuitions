@@ -22,6 +22,7 @@ const leadFieldSchemas = {
   studentGender: z.string().trim().max(30),
   preferredCampus: z.string().trim().max(40),
   preferredTiming: z.string().trim().max(40),
+  group: z.string().trim().max(20),
   question: z.string().trim().max(600),
 } as const;
 
@@ -38,6 +39,7 @@ export const leadUpdateSchema = z.object({
   studentGender: leadFieldSchemas.studentGender.optional(),
   preferredCampus: leadFieldSchemas.preferredCampus.optional(),
   preferredTiming: leadFieldSchemas.preferredTiming.optional(),
+  group: leadFieldSchemas.group.optional(),
   question: leadFieldSchemas.question.optional(),
 }).strict();
 

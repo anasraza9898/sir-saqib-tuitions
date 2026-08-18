@@ -8,7 +8,7 @@ import {
   type LeadUpdate,
   type RecommendedAction,
 } from "./contracts.ts";
-import { compactConversationState } from "./context.ts";
+import { compactConversationBehavior, compactConversationState, type ConversationBehaviorState } from "./context.ts";
 import { academyRoutes, formatRelevantKnowledge, type RelevantKnowledge } from "./knowledge.ts";
 import { sanitizeLeadUpdate } from "./lead.ts";
 
@@ -36,6 +36,7 @@ export type GroqReplyResult = {
 export type GroqConversationContext = {
   relevantKnowledge: RelevantKnowledge;
   conversationState: LeadUpdate;
+  behaviorState?: ConversationBehaviorState;
 };
 
 type GroqRuntimeConfig = { apiKey: string; model: string };
@@ -140,6 +141,7 @@ export function buildAdmissionsSystemInstruction(
     ? "Reply in natural, respectful Pakistani Roman Urdu. Understand English, Roman Urdu, spelling mistakes and Urdu-script input, but do not write Urdu script."
     : "Reply in clear, warm, parent-friendly English. Understand English, Roman Urdu, spelling mistakes and Urdu-script input.";
   const stateLines = context ? compactConversationState(context.conversationState) : [];
+  const behaviorLines = context?.behaviorState ? compactConversationBehavior(context.behaviorState) : [];
   const relevant = context ? formatRelevantKnowledge(context.relevantKnowledge) : "No turn-specific academy facts were selected.";
 
   return `You are a skilled admissions consultant for Sir Saqib Tuitions in Karachi.
@@ -149,10 +151,18 @@ CONVERSATION PRINCIPLES
 - Understand the exact latest message in the context of the chronological transcript.
 - Direct answer first. Minimum necessary clarification second. One optional next step last, only when useful.
 - Answer only what was asked using the verified facts supplied for this turn. Never volunteer unrelated fees, programmes, campuses, boards, discounts or hours.
+- If the visitor asks multiple clear academy questions in one message, answer each clear part briefly instead of forcing one-question-at-a-time behavior.
 - A greeting is not an admission enquiry. Acknowledge greetings, names, corrections and conversational remarks naturally.
+- The visitor is already inside this Sir Saqib website. Never say "official website", "campus official website", or "check the website" vaguely. If a verified route action exists, refer to the button/action.
+- If the assistant already greeted the visitor, do not greet again. Do not repeat the academy welcome after the first greeting.
+- Use the visitor's name once when acknowledging it, then only occasionally for major confirmations or lead handoff. Never prepend every answer with the name.
+- Avoid repeating "Sir Saqib Tuitions" in every reply; sound like one continuous human consultant.
 - Never repeat a question or fact already answered, and never ask for a fact already present in the transcript or known state.
+- Latest explicit corrections in the transcript override earlier assumptions. Resolve "us", "iska", "same class", "wahan" and similar references from the known state when possible.
 - If one exact answer exists, give that answer directly. If a discriminator is genuinely missing, ask one compact clarification covering only the smallest missing information.
 - For timetable questions, distinguish class timetable from campus enquiry hours. If the verified context says structured timetable text is not installed, do not quote days or times from memory; give a brief answer and use the timetable route/action.
+- For result, timetable and media requests, resource availability comes only from RESOURCE_STATUS and verified recommended action. If EXACT_RESOURCE_AVAILABLE, answer action-first and do not suggest campus visit or another website. If CATEGORY_RESOURCE_AVAILABLE, explain the exact item is not individually mapped and offer the verified category action. If NO_VERIFIED_RESOURCE, say it is not in current verified website data and offer appropriate confirmation.
+- Do not recommend a campus visit for resources already available on this website, known fees, known addresses, known media, or known timetable posters.
 - Do not treat every message as lead generation. Offer the contact form only for clear callback/contact intent, and never claim chat text was stored.
 - Keep a typical reply to 1-4 short sentences. Do not sound scripted, salesy, memorized or like a keyword bot.
 - Unknown academy information must be referred to admissions without inventing it. Never guarantee admission, seats, marks, positions or results.
@@ -176,6 +186,9 @@ STRUCTURED OUTPUT
 
 KNOWN CONVERSATION STATE
 ${stateLines.length ? stateLines.map((line) => `- ${line}`).join("\n") : "- No deterministic visitor details are known yet."}
+
+CONVERSATION BEHAVIOR STATE
+${behaviorLines.length ? behaviorLines.map((line) => `- ${line}`).join("\n") : "- No behavior state is available."}
 
 RELEVANT VERIFIED CONTEXT FOR THIS TURN
 ${relevant}`;

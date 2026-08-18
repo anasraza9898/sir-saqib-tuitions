@@ -10,7 +10,7 @@ import {
 } from "@/lib/ai/groq";
 import { consumeRateLimit, getRequestClientId } from "@/lib/ai/rate-limit";
 import { isAbusiveOrDangerous, isPromptInjectionAttempt } from "@/lib/ai/safety";
-import { extractConversationState } from "@/lib/ai/context";
+import { extractConversationBehavior, extractConversationState } from "@/lib/ai/context";
 import { selectRelevantKnowledge } from "@/lib/ai/knowledge";
 
 export const runtime = "nodejs";
@@ -67,9 +67,10 @@ export async function POST(request: Request) {
     .filter((message) => message.role === "user")
     .map((message) => message.content);
   const conversationState = extractConversationState(parsed.data.messages, parsed.data.leadState);
+  const behaviorState = extractConversationBehavior(parsed.data.messages, conversationState);
   const relevantKnowledge = selectRelevantKnowledge(latest, conversationState);
   const keyAvailable = hasGroqApiKey();
-  const deterministic = getLocalAssistantResponse(latest, history, parsed.data.language, conversationState);
+  const deterministic = getLocalAssistantResponse(latest, history, parsed.data.language, conversationState, parsed.data.messages);
 
   if (isPromptInjectionAttempt(latest) || isAbusiveOrDangerous(latest)) {
     return NextResponse.json<ChatSuccessResponse>({
@@ -88,6 +89,7 @@ export async function POST(request: Request) {
   try {
     const result = await generateGroqReply(parsed.data.messages, parsed.data.language, deterministic, {
       conversationState,
+      behaviorState,
       relevantKnowledge,
     });
     return NextResponse.json<ChatSuccessResponse>({

@@ -146,6 +146,7 @@ export function sanitizeLeadUpdate(update: LeadUpdate): LeadUpdate {
   const studentGender = findEnum(update.studentGender ?? "", LEAD_GENDERS);
   const preferredCampus = findEnum(update.preferredCampus ?? "", LEAD_CAMPUSES);
   const preferredTiming = findEnum(update.preferredTiming ?? "", LEAD_TIMINGS);
+  const group = update.group === "Group A" || update.group === "Group B" ? update.group : "";
   if (visitorType) clean.visitorType = visitorType;
   if (update.name && /^[\p{L}][\p{L} .'-]{1,79}$/u.test(update.name)) clean.name = update.name.trim();
   if (update.phone && normalizePakistanPhone(update.phone)) clean.phone = update.phone.trim();
@@ -154,6 +155,7 @@ export function sanitizeLeadUpdate(update: LeadUpdate): LeadUpdate {
   if (studentGender) clean.studentGender = studentGender;
   if (preferredCampus) clean.preferredCampus = preferredCampus;
   if (preferredTiming) clean.preferredTiming = preferredTiming;
+  if (group) clean.group = group;
   if (update.question && !containsSensitiveInformation(update.question)) clean.question = update.question.trim().slice(0, 600);
   return clean;
 }

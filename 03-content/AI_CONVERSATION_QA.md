@@ -1,115 +1,117 @@
 # AI Conversation QA
 
-Date: 2026-08-13  
-Environment: local Next.js dev server at `http://127.0.0.1:3000`  
+Date: 2026-08-18
+Environment: local workspace only
 Deployment: not performed
 
-## Root-Cause Audit
+## Focused Regression Audit
 
-The unacceptable replies came from the assistant orchestration treating deterministic keyword/fact lookup as a reply brain. The broad local knowledge path selected large blocks such as all programmes, all fees, or generic campus/timetable guidance, then those blocks were used as final answers or as schema fallbacks. That made greetings, names, fee questions and timing questions behave like keyword matches instead of context-aware admissions conversation.
+The final QA pass targeted real conversation failures observed after Groq was already connected.
 
-The redesigned path keeps deterministic logic for validation, state extraction, security blocks, fact selection, exact fee calculation, action validation and provider-failure fallback. Groq receives compact conversation state plus only the relevant verified facts for the latest turn, and composes the normal visible reply. Gemini remains optional legacy provider code only.
+Remaining issues found:
 
-## Current Pipeline
+1. Greeting and welcome text repeated because the AI prompt and backup guidance did not receive explicit conversation behavior state.
+2. Visitor names were overused because the system knew the name but did not track whether the assistant had already acknowledged it.
+3. Result availability contradicted itself because resource existence was left to model phrasing and loose intent selection.
+4. "Official website" and campus-visit fallbacks appeared because resource answers were not tied to deterministic actions before generation.
+5. "Class 9 Science group ka result" was incorrectly vulnerable to timetable classification because `group` had higher priority than explicit `result`.
+6. "Result dikhao" was too broadly classified as media because result poster and result-video requests were mixed.
 
-1. Client sends the recent chronological transcript plus deterministic lead draft state.
-2. Route validates shape, rate limits and body size.
-3. Explicit visitor state is extracted: name, role, class, stream, gender/campus, timing preference and question.
-4. Intent classification selects relevant facts only; it does not produce the ordinary final reply.
-5. Groq receives principle-based admissions instructions, compact state and the selected fact context.
-6. Structured output is optional except for `message`; Zod validates metadata and safe actions.
-7. If structured parsing fails, recover the textual model answer when possible.
-8. Deterministic text is used only for prompt/safety blocks, missing Groq configuration, rate-limit/provider failure, or infrastructure failure.
+## Architecture Changes
 
-## Timetable Handling
+- Added a verified resource registry in `src/lib/ai/resource-registry.ts` for result, timetable, video and page resources.
+- Added conversation behavior state: greeted, assistant greeting count, visitor-name acknowledgement and visitor-name use count.
+- Added Group A/B to sanitized lead/conversation state so timetable follow-ups like `group b` resolve naturally.
+- Passed conversation behavior state into Groq system instructions and Local Guidance.
+- Tightened Groq instructions: user is already on this website, never invent a vague official website, do not over-greet, do not overuse names, and use verified actions when available.
+- Updated Local Guidance to use the same resource registry and avoid contradictory result/timetable/media availability claims.
+- Reprioritized explicit result intent above timetable group terms.
+- Separated result poster requests from result-video/media requests.
+- Broadened name recognition for real Roman Urdu input such as `mera name anas hay`.
 
-The current verified timetable source contains official poster records for Grades IX-XII, class, stream and variant. No verified machine-readable day/time transcription is installed in `timetableSchedules`, so the assistant must not quote days, subjects or times from memory or images.
+## Verified Resource Registry
 
-Behavior verified:
+2025 result resources actually present in project metadata:
 
-- `Class 9 ki timing kya hai?` asks only for missing campus/gender and programme.
-- `Boys Class 9 Science Group A ki timing?` returns the exact official poster route for `ix-science-group-a`.
-- General schedule questions with multiple variants ask for the missing batch/timing.
-- Campus enquiry hours remain separate from class timetables.
+- Boys Campus XI-XII Groups: `/assets/results/boys-xi-xii-groups-2025.webp`, route `/results`
+- Boys Campus IX-X Matric: `/assets/results/boys-ix-x-matric-2025.webp`, route `/results`
+- Girls Campus XI-XII Groups: `/assets/results/girls-xi-xii-groups-2025.webp`, route `/results`
+- Girls Campus IX-X Matric: `/assets/results/girls-ix-x-matric-2025.webp`, route `/results`
 
-## Faculty, Results And Media
+2026 result resources actually present:
 
-Faculty answers are limited to the verified roster. Sir Saqib Zaki is answered as `CAT, B.Com, MBA` with 24 years of experience. Mathematics faculty returns Sir Muhammad Armash and Sir Shahid Punal only.
+- Boys Campus Matric - Science & General: `/assets/results/boys-matric-science-general-2026.webp`, route `/results`
+- Girls Campus Matric - General: `/assets/results/girls-matric-general-2026.webp`, route `/results`
+- Girls Campus Matric - Science: `/assets/results/girls-matric-science-2026.webp`, route `/results`
+- Girls Campus Matric - Science II: `/assets/results/girls-matric-science-2-2026.webp`, route `/results`
 
-Results route to verified 2026 or 2025 result poster categories without inventing marks or guarantees. Media requests route to `/media` with relevant verified video categories such as Classroom Learning, Boys Campus, Results, Academy Introduction and Testimonials.
+Timetable resources verified:
 
-## Live API QA
+- Grade IX Science Group A: `/assets/timetables/official/grade-ix-science-group-a.png`
+- Grade IX Science Group B: `/assets/timetables/official/grade-ix-science-group-b.png`
+- Remaining Grade IX-XII timetable posters from `src/data/site.ts`
 
-Command: `node scripts/test-conversation-api.mjs`  
-Result: `34/34` passed.
+Media resources verified:
 
-The current production provider order is Groq first, then verified Backup Guidance. The route does not automatically call Gemini after Groq failure. The fallback preserves direct facts and safe actions instead of broad canned blocks.
+- Academy Introduction, Girls Campus, Boys Campus, Classroom Learning, Results and Testimonials videos, all routed through `/media`.
 
-Covered cases:
+## Resource Resolution Rules
 
-| # | Case | Result |
-|---:|---|---|
-| 1 | Roman Urdu name introduction | Pass |
-| 2 | English name introduction | Pass |
-| 3 | Urdu-script greeting with Roman Urdu output | Pass |
-| 4 | Class 9 fee | Pass |
-| 5 | Misspelled Class 9 fee | Pass |
-| 6 | Urdu-script Class 9 fee | Pass |
-| 7 | Class 9 starting total | Pass |
-| 8 | Sibling discount | Pass |
-| 9 | Ambiguous Class 9 timing | Pass |
-| 10 | Boys IX Science Group A poster route | Pass |
-| 11 | Follow-up class/stream/group timing context | Pass |
-| 12 | Girls IX General ambiguous variant | Pass |
-| 13 | Boys Campus enquiry hours | Pass |
-| 14 | Sunday hours confirmation | Pass |
-| 15 | O Levels availability | Pass |
-| 16 | O Levels fee | Pass |
-| 17 | O Levels subjects | Pass |
-| 18 | Class 9 board/curriculum | Pass |
-| 19 | Sir Saqib experience | Pass |
-| 20 | Mathematics faculty | Pass |
-| 21 | Miss Javeria qualification | Pass |
-| 22 | Van to Gulshan | Pass |
-| 23 | Online classes | Pass |
-| 24 | Trial/demo class | Pass |
-| 25 | Admission documents | Pass |
-| 26 | Latest results | Pass |
-| 27 | 2025 results | Pass |
-| 28 | Classroom video | Pass |
-| 29 | Girls Campus address | Pass |
-| 30 | Medical advice boundary | Pass |
-| 31 | Prompt injection | Pass |
-| 32 | Serious callback intent | Pass |
-| 33 | Repeated Class 9 fee | Pass |
-| 34 | Campus correction follow-up | Pass |
+- `EXACT_RESOURCE_AVAILABLE`: answer action-first and return the exact route action.
+- `CATEGORY_RESOURCE_AVAILABLE`: state that the exact item is not individually mapped, then return the verified broader section/category action.
+- `NO_VERIFIED_RESOURCE`: state that the exact resource is not in current verified data and offer appropriate confirmation.
 
-## Google Sheets And Leads
+Groq receives the resource status and recommended action as explicit context. It does not decide availability from imagination.
 
-Credential presence from `.env.local` was reported as booleans only:
+## Timetable Behavior
 
-- `GOOGLE_SHEET_ID`: true
-- `GOOGLE_SERVICE_ACCOUNT_EMAIL`: true
-- `GOOGLE_PRIVATE_KEY`: true
+If class, stream and group are known, the assistant returns the exact timetable action. For Grade IX Science Group B, the action is `Open Group B Timetable` with `/timetables?class=9&stream=science&batch=ix-science-group-b`.
 
-Command: `npm run test:sheets`  
-Result: success. The script authenticated, verified spreadsheet access, verified the `Leads` tab, and appended to `Leads!A:O` with marker `TEST LEAD — DELETE ME`.
+If class/stream are known but group is missing, the assistant asks only for Group A or Group B. It does not answer with enquiry office hours and does not recommend a campus visit for online timetable access.
 
-Lead form API test:
+## Results Behavior
 
-- Endpoint: `POST /api/leads`
-- Status: `200`
-- Response status: `submitted`
-- `stored`: true
-- `developmentStatus`: `stored`
+Generic `2025 result` requests resolve to `Open 2025 Results`.
 
-The current local root cause for "leads not appearing" is not a Sheets adapter failure. The confirmed behavior is that typing a name and phone in chat does not write a row. A row is written only after the guided lead form is submitted with valid required fields and explicit consent.
+Class 9 Science result requests resolve to the verified Results section/category rather than falsely claiming a separately mapped public Class 9 Science result exists. Follow-ups like `yahi dikhao` keep the same category status and action, so availability does not flip to unavailable.
+
+## Sales-Agent Behavior
+
+Sales moments are now proof-driven:
+
+- Results questions surface result actions.
+- Timetable questions surface timetable actions.
+- Video/classroom questions surface media actions.
+- Known fee questions answer directly.
+- Campus visits are reserved for admission completion, seat availability or unverified physical/administrative details.
+
+## QA Coverage
+
+- Single-turn academy probes tested: 165.
+- Multi-turn conversation scenarios tested: 20.
+- Focused real-conversation regression tested: 8 turns.
+- Total deterministic AI tests: 36.
+
+Major focused failures discovered and fixed:
+
+- `mera name anas hay` was not classified as an introduction.
+- `class 9 science group ka result` was routed as timetable instead of results.
+- `mujhy 9 class ka result yahi dikhao nah` was routed as media instead of results.
+- Exact timetable resources returned internal registry facts instead of natural action text.
+- Older timetable tests expected retired fact wording rather than the new registry status.
 
 ## Command Results
 
-- `npm test`: 26/26 pass.
-- `npm run test:groq`: Production-provider smoke test.
-- `npm run test:gemini`: Optional legacy-provider smoke test only; not required for production readiness.
-- `npm run test:sheets`: OK; appended test row to `Leads!A:O`.
-- `npm run lint`: pass.
-- `npm run build`: pass; 16 static pages generated, both API routes dynamic.
+- `npm.cmd test`: pass, 36/36 tests.
+- `npm.cmd run test:groq`: pass. Groq API OK, model `openai/gpt-oss-20b`, structured response OK.
+- `npm.cmd run test:sheets`: pass. Credentials detected as present, spreadsheet access OK, append range `Leads!A:O`, smoke append OK.
+- `npm.cmd run lint`: pass.
+- `npm.cmd run build`: pass. Next build generated 16 static pages; `/api/ai/chat` and `/api/leads` remain dynamic.
+
+## Local Run Command
+
+Run manually:
+
+```bash
+npm run dev
+```
