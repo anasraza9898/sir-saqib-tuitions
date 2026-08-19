@@ -33,7 +33,7 @@ npm run assets    # Copy the controlled optimized asset manifest
 - `ClientProviders` supplies user-preference motion handling and the single-active-media controller.
 - `PremiumVideo` provides poster-first playback, custom sound/play/fullscreen controls and mobile-safe hero behavior.
 - Motion primitives live in `src/components/motion-system.tsx` and respect `prefers-reduced-motion`.
-- Programs, campuses, faculty, results, timetables, media, FAQs and assistant answers live in `src/data/site.ts`.
+- Programs, campuses, faculty, results, timetables, media and FAQs live in `src/data/site.ts`.
 - Interactive result, timetable, media and contact experiences render only the active media state.
 - Native metadata, sitemap, robots, organization/location JSON-LD, FAQ JSON-LD and breadcrumb JSON-LD cover search requirements.
 
@@ -62,9 +62,7 @@ through `npm run assets` and loaded from stable slots under
 - `grade-xii-science-main.png`
 
 The website must expose only the approved official timetable image entries in
-`src/data/site.ts`. AI timetable answers only use verified structured data from
-`timetableSchedules`; adding an image alone does not make the AI quote timetable
-text.
+`src/data/site.ts`.
 
 ## Deployment
 
@@ -75,18 +73,9 @@ The project is compatible with Vercel's standard Next.js flow:
 3. Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS origin. Vercel's production URL is used as a fallback when available.
 4. Do not expose server credentials through `NEXT_PUBLIC_*` variables.
 
-## AI and Leads
-
-The admission assistant uses server-side Groq AI Guidance when configured and
-falls back to verified Backup Guidance when the provider is unavailable. Gemini
-code remains in the repository as an optional legacy provider only. Lead capture
-is handled through `/api/leads` with validation, consent and duplicate
-protection.
-
 ## Content Guardrails
 
 - Keep the published ranges at Grades I-VIII, Matric, Intermediate and Huffaz.
-- Keep O Levels limited to the verified academy facts in `src/lib/ai/knowledge.ts` and `src/data/site.ts`.
 - Do not add ratings, student totals, awards, affiliations or performance percentages without approval.
 - Direct fees, exact timings, registration documents and trial-class questions to admissions.
 - Keep 2026 results separate from the previous 2025 collection.

@@ -69,7 +69,7 @@ export function ContactForm() {
           </div>
           <button type="submit" className="button-ink mt-6 w-full sm:w-auto">Prepare WhatsApp Message <ArrowRight size={16} /></button>
           {status ? <p className="mt-4 text-sm font-bold text-text" role="status">{status}</p> : null}
-          <p className="mt-6 flex gap-2 border-t border-cream-deep pt-5 text-xs leading-5 text-muted"><ShieldCheck size={15} className="mt-0.5 shrink-0 text-gold" />This enquiry builder prepares your message only. Lead submissions remain handled through the separate consent-based admissions form.</p>
+          <p className="mt-6 flex gap-2 border-t border-cream-deep pt-5 text-xs leading-5 text-muted"><ShieldCheck size={15} className="mt-0.5 shrink-0 text-gold" />This enquiry builder prepares your message only. You can review it in WhatsApp before sending it to admissions.</p>
         </div>
       </div>
     </form>

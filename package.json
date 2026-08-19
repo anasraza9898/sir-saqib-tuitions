@@ -8,22 +8,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint src scripts tests --no-error-on-unmatched-pattern",
+    "lint": "eslint src scripts --no-error-on-unmatched-pattern",
     "lint:fix": "eslint . --fix",
-    "test": "npm run test:ai",
-    "test:ai": "node --experimental-strip-types --test tests/ai.test.ts",
-    "test:groq": "node scripts/test-groq.mjs",
-    "test:gemini": "node scripts/test-gemini.mjs",
-    "test:sheets": "node scripts/test-google-sheets.mjs"
+    "test": "npm run lint"
   },
   "dependencies": {
-    "@google/genai": "^2.15.0",
     "framer-motion": "^12.43.0",
     "lucide-react": "^1.28.0",
     "next": "^16.2.12",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "zod": "^4.4.3"
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",

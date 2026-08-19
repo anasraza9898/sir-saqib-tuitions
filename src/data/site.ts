@@ -294,9 +294,9 @@ export type TimetableDay = { day: "Monday" | "Tuesday" | "Wednesday" | "Thursday
 
 /**
  * No current structured timetable transcription is installed. The stable
- * timetable slot index above is ready for final posters, but AI answers must
- * not quote old or image-derived schedule text until this record is updated
- * from verified structured timetable data.
+ * timetable slot index above is ready for final posters. Do not quote old or
+ * image-derived schedule text until this record is updated from verified
+ * structured timetable data.
  */
 export const timetableSchedules: Readonly<Record<string, readonly TimetableDay[]>> = {
 };
@@ -327,13 +327,5 @@ export const faqs = [
   { question: "Is there a programme for Huffaz?", answer: "Yes. The academy offers a Hafiz to Formal Education Programme and a crash course for Huffaz." },
   { question: "How can parents contact admissions?", answer: "Parents can call a campus directly or use the website's WhatsApp enquiry builder. Admissions will provide current fees, timings and registration guidance." },
 ] as const;
-
-export const assistantAnswers = {
-  "Find a Course": "Choose from Grades I-VIII foundation tuition, IX-X Science and General, XI-XII Pre-Medical, Pre-Engineering, General Science, Commerce, or the Huffaz Programme.",
-  "Choose a Campus": "The Boys and Girls campuses are in K.A.E.C.H.S, while the Hill Park Campus is near Hill Park. Each campus page includes direct call, WhatsApp and map actions.",
-  "Find a Timetable": "Open the timetable finder to choose a final timetable slot or contact admissions for the current confirmed timing.",
-  "Admissions Contact": "Admissions are open. Choose a campus contact to ask about current fees, timings and registration guidance.",
-  "Latest Results": "The latest gallery presents the academy's 2026 Matric result posters, with 2025 shown separately as previous academic highlights.",
-} as const;
 
 export const buildingIcon = Building2;
